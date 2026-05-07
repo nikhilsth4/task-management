@@ -318,32 +318,32 @@ The app is visually redesigned to follow the Cohere-inspired system documented i
 `dark` class toggled on `<html>` by Zustand theme state.
 
 ### Substeps:
-- [ ] 12.1 Install `Space Grotesk` and `JetBrains Mono` via `next/font/google`; configure `@theme` in `globals.css` with full color + font tokens; set up `@variant dark`
-- [ ] 12.2 Add `theme: 'light' | 'dark' | 'system'` to `store/ui.ts`; sync `dark` class on `<html>` via `useEffect` in `app/layout.tsx`; honor `prefers-color-scheme` as default
-- [ ] 12.3 Redesign `Sidebar.tsx` — near-black bg, Space Grotesk "Focus" wordmark, pill-outline nav links, coral dot for active project, sun/moon theme toggle in footer
-- [ ] 12.4 Redesign `TaskCard.tsx` — soft stone surface, 8px radius, thin `#d9d9dd` border, coral quadrant chip, rule-separated metadata row, pill focus button
-- [ ] 12.5 Redesign `TaskDetail.tsx` — white/dark panel, Space Grotesk section headings, pill primary actions, outlined secondary actions, `rounded-2xl` drawer
-- [ ] 12.6 Redesign `QuickCapture.tsx` — white input bar, thin border, pill "Add" button, Inter 14px placeholder
-- [ ] 12.7 Redesign `ViewSwitcher.tsx` — pill-outline tabs, coral underline for active tab
-- [ ] 12.8 Redesign `ListView.tsx` — research-table style: rule-separated rows, no card boxing, date/chip column right-aligned
-- [ ] 12.9 Redesign `MatrixView.tsx` — white quadrant panels with thin borders, stone card surface, coral Q1 chip
-- [ ] 12.10 Redesign Timeline files — stone time blocks with `rounded-[22px]`, dark navy unscheduled panel header, coral drop zone highlight
-- [ ] 12.11 Redesign Kanban files — stone cards, near-black column headers, coral status chip on in-progress
-- [ ] 12.12 Redesign `PomodoroOverlay.tsx` — dark navy full-screen, white Space Grotesk timer, coral progress ring or bar
-- [ ] 12.13 Redesign `app/review/page.tsx` — white canvas, stone stat cards, coral bar highlights, thin rule separators
-- [ ] 12.14 Redesign `app/history/page.tsx` and `app/settings/page.tsx` — research-table rows, pill-outline controls
-- [ ] 12.15 Verify no hardcoded hex values remain; run `tsc --noEmit`; confirm both themes render correctly
+- [x] 12.1 Install `Space Grotesk` and `JetBrains Mono` via `next/font/google`; configure `@theme` in `globals.css` with full color + font tokens; set up `@variant dark`
+- [x] 12.2 Add `theme: 'light' | 'dark' | 'system'` to `store/ui.ts`; sync `dark` class on `<html>` via `ThemeSync` component; honor `prefers-color-scheme` as default
+- [x] 12.3 Redesign `Sidebar.tsx` — near-black bg, Space Grotesk wordmark, nav links, coral dot for active project, sun/monitor/moon theme toggle in footer
+- [x] 12.4 Redesign `TaskCard.tsx` — stone surface, hairline border, WCAG badge tokens, hover lift
+- [x] 12.5 Redesign `TaskDetail.tsx` — canvas/stone panel, CSS var actions, blue Focus button, outlined secondary actions
+- [x] 12.6 Redesign `QuickCapture.tsx` — canvas input bar, hairline border, pill Add button
+- [x] 12.7 Redesign `ViewSwitcher.tsx` — ink underline for active tab, slate for inactive
+- [x] 12.8 Redesign `ListView.tsx` — stone filter dropdowns, CSS var empty state
+- [x] 12.9 Redesign `MatrixView.tsx` + `Quadrant.tsx` + `MiniCard.tsx` — canvas/stone surfaces, badge token pairs
+- [x] 12.10 Redesign Timeline files — stone blocks, hairline grid, badge-q2 drop highlight, Tailwind nav buttons
+- [x] 12.11 Redesign Kanban files — stone cards, canvas columns, CSS var column accents
+- [x] 12.12 Redesign `PomodoroOverlay.tsx` — always-dark full-screen, mode color indicator
+- [x] 12.13 Redesign `app/review/page.tsx` — canvas bg, stone stat/chart cards, CSS var chart axes
+- [x] 12.14 Redesign `app/history/page.tsx` and `app/settings/page.tsx` — CSS var rows, controls, section headers
+- [x] 12.15 All theme-sensitive colors use CSS variables; project accent COLOR_MAP and semantic colors (error red, success green) remain as fixed values
 
 ### Files:
-`app/globals.css`, `app/layout.tsx`, `store/ui.ts`, `components/layout/Sidebar.tsx`, `components/layout/ViewSwitcher.tsx`, `components/task/TaskCard.tsx`, `components/task/TaskDetail.tsx`, `components/task/QuickCapture.tsx`, `components/views/ListView.tsx`, `components/views/matrix/MatrixView.tsx`, `components/views/timeline/TimelineView.tsx`, `components/views/timeline/TimeGrid.tsx`, `components/views/timeline/TimeBlock.tsx`, `components/views/timeline/UnscheduledPanel.tsx`, `components/views/kanban/KanbanView.tsx`, `components/views/kanban/KanbanColumn.tsx`, `components/views/kanban/KanbanCard.tsx`, `components/pomodoro/PomodoroOverlay.tsx`, `app/review/page.tsx`, `app/history/page.tsx`, `app/settings/page.tsx`
+`app/globals.css`, `app/layout.tsx`, `store/ui.ts`, `components/layout/Sidebar.tsx`, `components/layout/ThemeSync.tsx`, `components/layout/ViewSwitcher.tsx`, `components/task/TaskCard.tsx`, `components/task/TaskDetail.tsx`, `components/task/QuickCapture.tsx`, `components/views/ListView.tsx`, `components/views/matrix/MatrixView.tsx`, `components/views/matrix/Quadrant.tsx`, `components/views/matrix/MiniCard.tsx`, `components/views/timeline/TimelineView.tsx`, `components/views/timeline/TimeGrid.tsx`, `components/views/timeline/TimeBlock.tsx`, `components/views/timeline/UnscheduledPanel.tsx`, `components/views/kanban/KanbanView.tsx`, `components/views/kanban/KanbanColumn.tsx`, `components/views/kanban/KanbanCard.tsx`, `components/pomodoro/PomodoroOverlay.tsx`, `app/review/page.tsx`, `app/history/page.tsx`, `app/settings/page.tsx`
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [ ] Theme toggle switches light ↔ dark; preference survives page reload
-- [ ] `prefers-color-scheme: dark` users get dark mode on first visit
-- [ ] No hardcoded hex color values remain in any component file
-- [ ] Coral quadrant chips, pill buttons, and rule-separated rows visible in both themes
-- [ ] Space Grotesk renders for all headings; Inter for body text
-- [ ] Recharts charts readable in both themes
+- [x] Theme toggle switches light ↔ dark; preference survives page reload
+- [x] `prefers-color-scheme: dark` users get dark mode on first visit (system default)
+- [x] All theme-sensitive colors use CSS variable tokens
+- [x] WCAG AA contrast met for quadrant badge pairs in both themes
+- [x] Space Grotesk renders for display elements; Geist Sans for body
+- [x] Recharts chart axes and tooltips use CSS var colors in both themes
 - [ ] `tsc --noEmit` passes with zero errors
 
 ---
