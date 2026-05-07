@@ -421,7 +421,7 @@ export default function TaskDetail() {
           <button
             onClick={() => { startPomodoro(task!.id); setSelectedTaskId(null) }}
             className="flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-[12px] font-medium cursor-pointer border-none text-white"
-            style={{ background: 'var(--color-ink)' }}
+            style={{ background: 'var(--color-blue-action)' }}
           >
             <Timer size={13} />
             Focus

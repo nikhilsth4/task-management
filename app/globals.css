@@ -13,7 +13,7 @@
   --color-canvas:         #f7f6f3;
   --color-stone:          #eeece7;
   --color-ink:            #212121;
-  --color-slate:          #93939f;
+  --color-slate:          #5c5c6e;
   --color-hairline:       #d9d9dd;
   --color-rule:           #e5e7eb;
   --color-sidebar:        #17171c;
@@ -21,7 +21,7 @@
   --color-sidebar-text:   #aaaaaa;
   --color-coral:          #ff7759;
   --color-blue-action:    #1863dc;
-  --color-muted:          #bbbbbb;
+  --color-muted:          #7a7a8a;
   --color-surface:        #fafaf9;
 
   /* Quadrant badge tokens — WCAG AA contrast guaranteed */
@@ -40,13 +40,13 @@ html.dark {
   --color-canvas:         #071829;
   --color-stone:          #0d1f2d;
   --color-ink:            #f0f0f0;
-  --color-slate:          #6b7f8f;
+  --color-slate:          #90a8bc;
   --color-hairline:       #1a2e3f;
   --color-rule:           #1e3040;
   --color-sidebar:        #0a0a0f;
   --color-sidebar-active: #141420;
-  --color-sidebar-text:   #666666;
-  --color-muted:          #444444;
+  --color-sidebar-text:   #888888;
+  --color-muted:          #7a8fa0;
   --color-surface:        #0d1f2d;
 
   --badge-q1-bg:   rgba(255,119,89,0.18);
