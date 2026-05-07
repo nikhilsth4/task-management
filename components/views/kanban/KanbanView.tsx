@@ -10,8 +10,9 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { useTaskStore, selectActiveTasks, type Status } from '@/store/tasks'
+import { useTaskStore, type Status } from '@/store/tasks'
 import { useUIStore } from '@/store/ui'
+import { isoToday } from '@/lib/utils'
 import KanbanColumn, { type ColumnConfig } from './KanbanColumn'
 import MiniCard from '../matrix/MiniCard'
 
@@ -22,7 +23,7 @@ const COLUMNS: ColumnConfig[] = [
 ]
 
 export default function KanbanView() {
-  const allTasks = selectActiveTasks(useTaskStore((s) => s.tasks))
+  const allTasks = useTaskStore((s) => s.tasks)
   const updateTask = useTaskStore((s) => s.updateTask)
   const completeTask = useTaskStore((s) => s.completeTask)
   const filterProjectId = useUIStore((s) => s.filterProjectId)
@@ -31,11 +32,14 @@ export default function KanbanView() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const activeTask = activeId ? allTasks.find((t) => t.id === activeId) ?? null : null
 
-  const tasks = allTasks.filter((t) => {
-    if (filterProjectId === 'all') return true
-    if (filterProjectId === '') return t.projectId === null
-    return t.projectId === filterProjectId
-  })
+  const today = isoToday()
+  const tasks = allTasks
+    .filter((t) => t.scheduledDate === null || t.scheduledDate === today)
+    .filter((t) => {
+      if (filterProjectId === 'all') return true
+      if (filterProjectId === '') return t.projectId === null
+      return t.projectId === filterProjectId
+    })
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })

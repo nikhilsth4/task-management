@@ -1,39 +1,41 @@
-import { type Task } from '@/store/tasks'
+import { type Task, type Recurrence } from '@/store/tasks'
 
-// Returns true if a recurring task template is due on the given date.
-export function isDueToday(task: Task, todayStr: string): boolean {
-  if (task.recurrence === 'none') return false
+// Returns the next ISO date string on which a recurring task is due, starting from the day after fromDate.
+export function nextOccurrenceDate(
+  recurrence: Recurrence,
+  customDays: number[],
+  fromDate: string
+): string | null {
+  if (recurrence === 'none') return null
 
-  const today = new Date(todayStr + 'T12:00:00')
-  const dayOfWeek = today.getDay() // 0=Sun, 1=Mon ... 6=Sat
+  const from = new Date(fromDate + 'T12:00:00')
 
-  if (task.recurrence === 'daily') return true
+  for (let i = 1; i <= 14; i++) {
+    const candidate = new Date(from)
+    candidate.setDate(from.getDate() + i)
+    const dow = candidate.getDay()
 
-  if (task.recurrence === 'weekdays') return dayOfWeek >= 1 && dayOfWeek <= 5
-
-  if (task.recurrence === 'weekly') {
-    const origin = new Date((task.scheduledDate ?? task.createdAt.slice(0, 10)) + 'T12:00:00')
-    return origin.getDay() === dayOfWeek
+    if (recurrence === 'daily') return candidate.toISOString().slice(0, 10)
+    if (recurrence === 'weekdays' && dow >= 1 && dow <= 5) return candidate.toISOString().slice(0, 10)
+    if (recurrence === 'weekly' && dow === from.getDay()) return candidate.toISOString().slice(0, 10)
+    if (recurrence === 'custom' && (customDays ?? []).includes(dow)) return candidate.toISOString().slice(0, 10)
   }
 
-  if (task.recurrence === 'custom') {
-    return (task.customDays ?? []).includes(dayOfWeek)
-  }
-
-  return false
+  return null
 }
 
-// Builds a new task instance from a recurring template.
-export function buildInstance(template: Task, todayStr: string, generateId: () => string, isoNow: () => string): Task {
+// Builds a new task instance from a recurring template scheduled for nextDate.
+export function buildInstance(template: Task, nextDate: string, generateId: () => string, isoNow: () => string): Task {
   return {
     ...template,
     id: generateId(),
-    scheduledDate: todayStr,
+    scheduledDate: nextDate,
+    scheduledTime: template.scheduledTime,
     status: 'todo',
     completedAt: null,
     pomodoroSessions: 0,
     createdAt: isoNow(),
-    recurrence: 'none', // instances are one-off copies; the template holds the recurrence
+    recurrence: 'none',
     customDays: [],
   }
 }

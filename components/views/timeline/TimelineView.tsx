@@ -18,7 +18,7 @@ import UnscheduledPanel from './UnscheduledPanel'
 import MiniCard from '../matrix/MiniCard'
 
 export default function TimelineView() {
-  const allTasks = selectActiveTasks(useTaskStore((s) => s.tasks))
+  const allTasks = useTaskStore((s) => s.tasks)
   const addTask = useTaskStore((s) => s.addTask)
   const updateTask = useTaskStore((s) => s.updateTask)
   const settings = useUIStore((s) => s.settings)

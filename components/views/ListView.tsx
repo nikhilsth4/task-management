@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react' // still used for filterTag
-import { useTaskStore, selectActiveTasks } from '@/store/tasks'
+import { useTaskStore } from '@/store/tasks'
 import { useProjectStore } from '@/store/projects'
 import { useUIStore } from '@/store/ui'
-import { getQuadrantPriority } from '@/lib/utils'
+import { getQuadrantPriority, isoToday } from '@/lib/utils'
 import TaskCard from '@/components/task/TaskCard'
 
 export default function ListView() {
-  const tasks = selectActiveTasks(useTaskStore((s) => s.tasks))
+  const tasks = useTaskStore((s) => s.tasks)
   const projects = useProjectStore((s) => s.projects)
   const setSelectedTaskId = useUIStore((s) => s.setSelectedTaskId)
   const filterProjectId = useUIStore((s) => s.filterProjectId)
@@ -18,7 +18,9 @@ export default function ListView() {
 
   const allTags = Array.from(new Set(tasks.flatMap((t) => t.tags))).sort()
 
+  const today = isoToday()
   const filtered = tasks
+    .filter((t) => t.scheduledDate === null || t.scheduledDate === today)
     .filter((t) => {
       if (filterProjectId === 'all') return true
       if (filterProjectId === '') return t.projectId === null

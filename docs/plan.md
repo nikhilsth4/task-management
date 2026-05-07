@@ -235,27 +235,29 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 
 ## Part 11: Recurring Tasks & History
 
+### Recurring Task Design:
+Completing a recurring task immediately spawns the next instance scheduled for the next occurrence date. No on-load generation — completion is the trigger. Instances have `recurrence: none` so they don't chain further.
+
 ### Substeps:
 - [x] 11.1 Add `customDays: number[]` to Task model (0=Sun … 6=Sat)
 - [x] 11.2 Add day-picker UI in TaskDetail — shown when `recurrence === 'custom'`
-- [x] 11.3 Create `lib/recurrence.ts` — `isDueToday` + `buildInstance` logic
-- [x] 11.4 Add `lastRecurrenceCheck` to UIStore (persisted)
-- [x] 11.5 On app load, generate due recurring instances if not already checked today
-- [x] 11.6 Completed instances are independent copies — template persists unchanged
-- [x] 11.7 Recurring templates hidden from all views via `selectActiveTasks` selector
-- [x] 11.8 Unfinished scheduled tasks roll over to today on app load (status reset to todo)
-- [x] 11.9 Add `/history` page — completed tasks grouped by date, newest first
-- [x] 11.10 Add Completed nav link to Sidebar
+- [x] 11.3 Create `lib/recurrence.ts` — `nextOccurrenceDate` + `buildInstance` logic
+- [x] 11.4 `completeTask` in store spawns next instance if task has recurrence set
+- [x] 11.5 Instances scheduled for next occurrence date with `recurrence: none`
+- [x] 11.6 Unfinished scheduled tasks roll over to today on app load (status reset to todo)
+- [x] 11.7 All views filter to today + unscheduled tasks only
+- [x] 11.8 Add `/history` page — completed tasks grouped by date, newest first
+- [x] 11.9 Add Completed nav link to Sidebar
 
 ### Files:
-`store/tasks.ts`, `store/ui.ts`, `lib/recurrence.ts`, `components/task/TaskDetail.tsx`, `app/(today)/page.tsx`, `app/history/page.tsx`, `components/layout/Sidebar.tsx`
+`store/tasks.ts`, `lib/recurrence.ts`, `components/task/TaskDetail.tsx`, `app/(today)/page.tsx`, `app/history/page.tsx`, `components/layout/Sidebar.tsx`
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [x] Daily task generates a new instance every day on load
-- [x] Weekday task skips Saturday and Sunday
-- [x] Weekly task only generates on the correct day of week
-- [x] Custom task only generates on the selected days
-- [x] Completing a generated instance does not affect the template
-- [x] Instances are not duplicated if the app is loaded multiple times in one day
+- [x] Completing a daily task creates a new instance for tomorrow
+- [x] Completing a weekday task skips to next weekday
+- [x] Completing a weekly task schedules next instance 7 days later (same weekday)
+- [x] Completing a custom task schedules next instance on the next selected day
+- [x] New instance has recurrence: none — does not chain further
 - [x] Unfinished past tasks roll to today with status reset to todo
+- [x] Views show only today + unscheduled tasks
 - [x] Completed page groups tasks by date with completion time shown

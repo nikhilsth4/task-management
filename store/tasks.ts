@@ -2,8 +2,9 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { generateId, isoNow } from '@/lib/utils'
+import { generateId, isoNow, isoToday } from '@/lib/utils'
 import { DEFAULT_TASK_DURATION } from '@/lib/constants'
+import { nextOccurrenceDate, buildInstance } from '@/lib/recurrence'
 
 export type Recurrence = 'none' | 'daily' | 'weekly' | 'weekdays' | 'custom'
 export type Status = 'todo' | 'in_progress' | 'done'
@@ -84,11 +85,22 @@ export const useTaskStore = create<TasksState>()(
       },
 
       completeTask: (id) => {
-        set((s) => ({
-          tasks: s.tasks.map((t) =>
-            t.id === id ? { ...t, status: 'done', completedAt: isoNow() } : t
-          ),
-        }))
+        set((s) => {
+          const task = s.tasks.find((t) => t.id === id)
+          if (!task) return {}
+
+          const completed = { ...task, status: 'done' as const, completedAt: isoNow() }
+          const updated = s.tasks.map((t) => (t.id === id ? completed : t))
+
+          if (task.recurrence === 'none') return { tasks: updated }
+
+          const fromDate = task.scheduledDate ?? isoToday()
+          const nextDate = nextOccurrenceDate(task.recurrence, task.customDays ?? [], fromDate)
+          if (!nextDate) return { tasks: updated }
+
+          const instance = buildInstance(task, nextDate, generateId, isoNow)
+          return { tasks: [...updated, instance] }
+        })
       },
     }),
     { name: 'tasks' }

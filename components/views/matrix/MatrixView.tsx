@@ -10,9 +10,9 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { useTaskStore, selectActiveTasks, type Urgency, type Importance } from '@/store/tasks'
+import { useTaskStore, type Urgency, type Importance } from '@/store/tasks'
 import { useUIStore } from '@/store/ui'
-import { getQuadrant } from '@/lib/utils'
+import { getQuadrant, isoToday } from '@/lib/utils'
 import Quadrant, { type QuadrantConfig } from './Quadrant'
 import MiniCard from './MiniCard'
 
@@ -37,16 +37,19 @@ const QUADRANT_MAP: Record<QuadrantId, { urgency: Urgency; importance: Importanc
 }
 
 export default function MatrixView() {
-  const allTasks = selectActiveTasks(useTaskStore((s) => s.tasks))
+  const allTasks = useTaskStore((s) => s.tasks)
   const updateTask = useTaskStore((s) => s.updateTask)
   const setSelectedTaskId = useUIStore((s) => s.setSelectedTaskId)
   const filterProjectId = useUIStore((s) => s.filterProjectId)
 
-  const tasks = allTasks.filter((t) => {
-    if (filterProjectId === 'all') return true
-    if (filterProjectId === '') return t.projectId === null
-    return t.projectId === filterProjectId
-  })
+  const today = isoToday()
+  const tasks = allTasks
+    .filter((t) => t.scheduledDate === null || t.scheduledDate === today)
+    .filter((t) => {
+      if (filterProjectId === 'all') return true
+      if (filterProjectId === '') return t.projectId === null
+      return t.projectId === filterProjectId
+    })
 
   const [activeId, setActiveId] = useState<string | null>(null)
   const activeTask = activeId ? (tasks.find((t) => t.id === activeId) ?? null) : null
