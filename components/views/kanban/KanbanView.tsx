@@ -17,9 +17,9 @@ import KanbanColumn, { type ColumnConfig } from './KanbanColumn'
 import MiniCard from '../matrix/MiniCard'
 
 const COLUMNS: ColumnConfig[] = [
-  { id: 'todo',        label: 'To Do',       accent: '#6B7280' },
-  { id: 'in_progress', label: 'In Progress',  accent: '#2563EB' },
-  { id: 'done',        label: 'Done',         accent: '#16A34A' },
+  { id: 'todo',        label: 'To Do',      accentVar: 'var(--color-slate)' },
+  { id: 'in_progress', label: 'In Progress', accentVar: 'var(--color-blue-action)' },
+  { id: 'done',        label: 'Done',        accentVar: '#16A34A' },
 ]
 
 export default function KanbanView() {
@@ -65,10 +65,7 @@ export default function KanbanView() {
 
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div style={{
-        display: 'flex', gap: 12,
-        padding: 16, height: '100%', boxSizing: 'border-box',
-      }}>
+      <div className="flex gap-3 p-4 h-full box-border">
         {COLUMNS.map((col) => (
           <KanbanColumn
             key={col.id}

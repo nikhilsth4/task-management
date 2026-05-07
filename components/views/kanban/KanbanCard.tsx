@@ -18,7 +18,7 @@ interface Props {
 export default function KanbanCard({ task, onTaskClick }: Props) {
   const projects = useProjectStore((s) => s.projects)
   const project = projects.find((p) => p.id === task.projectId)
-  const accent = project ? (COLOR_MAP[project.color] ?? '#E5E7EB') : '#E5E7EB'
+  const accent = project ? (COLOR_MAP[project.color] ?? 'var(--color-hairline)') : 'var(--color-hairline)'
   const done = task.status === 'done'
 
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: task.id })
@@ -29,42 +29,36 @@ export default function KanbanCard({ task, onTaskClick }: Props) {
       {...listeners}
       {...attributes}
       onClick={() => onTaskClick(task.id)}
+      className="flex items-stretch rounded-lg overflow-hidden shrink-0 transition-[box-shadow,opacity] duration-150"
       style={{
-        display: 'flex', alignItems: 'stretch',
-        background: '#FFFFFF',
-        border: '1px solid #E8E6E0',
-        borderRadius: 8,
-        overflow: 'hidden',
+        background: 'var(--color-stone)',
+        border: '1px solid var(--color-hairline)',
         cursor: isDragging ? 'grabbing' : 'grab',
         opacity: isDragging ? 0.3 : 1,
         boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-        transition: 'box-shadow 0.15s, opacity 0.15s',
-        flexShrink: 0,
       }}
       onMouseEnter={(e) => { if (!isDragging) e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)' }}
       onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)' }}
     >
-      <span style={{
-        width: 3, flexShrink: 0,
-        background: accent,
-        borderRadius: '2px 0 0 2px',
-      }} />
-      <div style={{ padding: '10px 12px', flex: 1, minWidth: 0 }}>
-        <p style={{
-          margin: 0, fontSize: 13, fontWeight: 500,
-          color: done ? '#AAAAAA' : '#141414',
-          textDecoration: done ? 'line-through' : 'none',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          lineHeight: 1.4,
-        }}>
+      <span className="w-[3px] shrink-0 rounded-l-[2px]" style={{ background: accent }} />
+      <div className="px-3 py-2.5 flex-1 min-w-0">
+        <p
+          className="m-0 text-[13px] font-medium overflow-hidden text-ellipsis whitespace-nowrap leading-snug"
+          style={{
+            color: done ? 'var(--color-slate)' : 'var(--color-ink)',
+            textDecoration: done ? 'line-through' : 'none',
+          }}
+        >
           {task.title}
         </p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+        <div className="flex items-center gap-1.5 mt-1">
           {project && (
-            <span style={{ fontSize: 11, color: '#AAAAAA' }}>{project.title}</span>
+            <span className="text-[11px]" style={{ color: 'var(--color-slate)' }}>
+              {project.title}
+            </span>
           )}
           {task.scheduledTime && (
-            <span style={{ fontSize: 11, color: '#AAAAAA', marginLeft: 'auto' }}>
+            <span className="text-[11px] ml-auto" style={{ color: 'var(--color-slate)' }}>
               {formatTimeRange(task.scheduledTime, task.duration)}
             </span>
           )}

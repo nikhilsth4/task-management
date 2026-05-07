@@ -7,7 +7,7 @@ import KanbanCard from './KanbanCard'
 export interface ColumnConfig {
   id: string
   label: string
-  accent: string
+  accentVar: string
 }
 
 interface Props {
@@ -21,48 +21,46 @@ export default function KanbanColumn({ config, tasks, activeId, onTaskClick }: P
   const { setNodeRef, isOver } = useDroppable({ id: config.id })
 
   return (
-    <div style={{
-      display: 'flex', flexDirection: 'column',
-      background: isOver ? '#F5F8FF' : '#F7F6F3',
-      border: '1px solid #E8E6E0',
-      borderRadius: 10,
-      transition: 'background 0.12s',
-      minWidth: 0, flex: 1,
-    }}>
-      {/* Column header */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '12px 14px 10px',
-        borderBottom: '1px solid #ECEAE4',
-        flexShrink: 0,
-      }}>
-        <span style={{
-          width: 8, height: 8, borderRadius: '50%',
-          background: config.accent, flexShrink: 0,
-        }} />
-        <span style={{ fontSize: 12, fontWeight: 600, color: '#555', letterSpacing: '0.03em' }}>
+    <div
+      className="flex flex-col min-w-0 flex-1 rounded-[10px] transition-colors duration-150"
+      style={{
+        background: isOver ? 'var(--badge-q2-bg)' : 'var(--color-canvas)',
+        border: '1px solid var(--color-hairline)',
+      }}
+    >
+      <div
+        className="flex items-center gap-2 px-3.5 pt-3 pb-2.5 shrink-0"
+        style={{ borderBottom: '1px solid var(--color-hairline)' }}
+      >
+        <span
+          className="w-2 h-2 rounded-full shrink-0"
+          style={{ background: config.accentVar }}
+        />
+        <span
+          className="text-[12px] font-semibold tracking-[0.03em]"
+          style={{ color: 'var(--color-slate)' }}
+        >
           {config.label}
         </span>
-        <span style={{
-          marginLeft: 'auto', fontSize: 11, color: '#AAAAAA',
-          background: '#ECEAE4', borderRadius: 10,
-          padding: '1px 7px', fontWeight: 500,
-        }}>
+        <span
+          className="ml-auto text-[11px] font-medium px-1.5 py-px rounded-[10px]"
+          style={{
+            color: 'var(--color-muted)',
+            background: 'var(--color-stone)',
+          }}
+        >
           {tasks.filter((t) => t.id !== activeId).length}
         </span>
       </div>
 
-      {/* Cards */}
       <div
         ref={setNodeRef}
-        style={{
-          flex: 1, overflowY: 'auto',
-          padding: '10px 10px 14px',
-          display: 'flex', flexDirection: 'column', gap: 8,
-        }}
+        className="flex-1 overflow-y-auto px-2.5 pb-3.5 pt-2.5 flex flex-col gap-2"
       >
         {tasks.length === 0 ? (
-          <p style={{ margin: '8px 4px', fontSize: 12, color: '#CCCCCC' }}>No tasks</p>
+          <p className="mx-1 my-2 text-[12px]" style={{ color: 'var(--color-muted)' }}>
+            No tasks
+          </p>
         ) : (
           tasks.map((task) => (
             <KanbanCard key={task.id} task={task} onTaskClick={onTaskClick} />
