@@ -5,6 +5,8 @@ import { useUIStore } from '@/store/ui'
 import ViewSwitcher from '@/components/layout/ViewSwitcher'
 import QuickCapture from '@/components/task/QuickCapture'
 import ListView from '@/components/views/ListView'
+import MatrixView from '@/components/views/matrix/MatrixView'
+import TaskDetail from '@/components/task/TaskDetail'
 
 export default function TodayPage() {
   const activeView = useUIStore((s) => s.activeView)
@@ -30,9 +32,7 @@ export default function TodayPage() {
       <ViewSwitcher />
       <main style={{ flex: 1, overflowY: 'auto', background: '#F7F6F3' }}>
         {activeView === 'list' && <ListView />}
-        {activeView === 'matrix' && (
-          <div style={{ padding: 24, color: '#BBBBBB', fontSize: 14 }}>Matrix view — coming in Part 5</div>
-        )}
+        {activeView === 'matrix' && <MatrixView />}
         {activeView === 'timeline' && (
           <div style={{ padding: 24, color: '#BBBBBB', fontSize: 14 }}>Timeline view — coming in Part 7</div>
         )}
@@ -40,6 +40,7 @@ export default function TodayPage() {
           <div style={{ padding: 24, color: '#BBBBBB', fontSize: 14 }}>Kanban view — coming in Part 8</div>
         )}
       </main>
+      <TaskDetail />
     </div>
   )
 }
