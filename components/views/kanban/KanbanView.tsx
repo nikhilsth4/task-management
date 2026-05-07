@@ -10,7 +10,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { useTaskStore, type Status } from '@/store/tasks'
+import { useTaskStore, selectActiveTasks, type Status } from '@/store/tasks'
 import { useUIStore } from '@/store/ui'
 import KanbanColumn, { type ColumnConfig } from './KanbanColumn'
 import MiniCard from '../matrix/MiniCard'
@@ -22,7 +22,7 @@ const COLUMNS: ColumnConfig[] = [
 ]
 
 export default function KanbanView() {
-  const allTasks = useTaskStore((s) => s.tasks)
+  const allTasks = selectActiveTasks(useTaskStore((s) => s.tasks))
   const updateTask = useTaskStore((s) => s.updateTask)
   const completeTask = useTaskStore((s) => s.completeTask)
   const filterProjectId = useUIStore((s) => s.filterProjectId)

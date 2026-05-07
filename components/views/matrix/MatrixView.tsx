@@ -10,7 +10,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { useTaskStore, type Urgency, type Importance } from '@/store/tasks'
+import { useTaskStore, selectActiveTasks, type Urgency, type Importance } from '@/store/tasks'
 import { useUIStore } from '@/store/ui'
 import { getQuadrant } from '@/lib/utils'
 import Quadrant, { type QuadrantConfig } from './Quadrant'
@@ -37,7 +37,7 @@ const QUADRANT_MAP: Record<QuadrantId, { urgency: Urgency; importance: Importanc
 }
 
 export default function MatrixView() {
-  const allTasks = useTaskStore((s) => s.tasks)
+  const allTasks = selectActiveTasks(useTaskStore((s) => s.tasks))
   const updateTask = useTaskStore((s) => s.updateTask)
   const setSelectedTaskId = useUIStore((s) => s.setSelectedTaskId)
   const filterProjectId = useUIStore((s) => s.filterProjectId)

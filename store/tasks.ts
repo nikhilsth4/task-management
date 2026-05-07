@@ -22,6 +22,7 @@ export interface Task {
   scheduledTime: string | null
   duration: number | null
   recurrence: Recurrence
+  customDays: number[]   // 0=Sun … 6=Sat, used when recurrence === 'custom'
   pomodoroSessions: number
   tags: string[]
   createdAt: string
@@ -36,6 +37,9 @@ interface TasksState {
   deleteTasksByProject: (projectId: string) => void
   completeTask: (id: string) => void
 }
+
+// Use in all views — hides recurring templates (they're config, not actionable tasks)
+export const selectActiveTasks = (tasks: Task[]) => tasks.filter((t) => t.recurrence === 'none')
 
 export const useTaskStore = create<TasksState>()(
   persist(
@@ -55,6 +59,7 @@ export const useTaskStore = create<TasksState>()(
           scheduledTime: partial.scheduledTime ?? null,
           duration: partial.duration ?? DEFAULT_TASK_DURATION,
           recurrence: partial.recurrence ?? 'none',
+          customDays: partial.customDays ?? [],
           pomodoroSessions: partial.pomodoroSessions ?? 0,
           tags: partial.tags ?? [],
           createdAt: isoNow(),

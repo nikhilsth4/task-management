@@ -294,6 +294,39 @@ export default function TaskDetail() {
             </Field>
           </div>
 
+          {/* Custom day picker */}
+          {task.recurrence === 'custom' && (
+            <Field label="Repeat on">
+              <div style={{ display: 'flex', gap: 6 }}>
+                {['S','M','T','W','T','F','S'].map((label, i) => {
+                  const active = (task.customDays ?? []).includes(i)
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        const days = task.customDays ?? []
+                        const next = active
+                          ? days.filter((d) => d !== i)
+                          : [...days, i].sort()
+                        updateTask(task.id, { customDays: next })
+                      }}
+                      style={{
+                        width: 30, height: 30, borderRadius: '50%',
+                        fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                        border: '1px solid',
+                        borderColor: active ? '#2563EB' : '#E8E6E0',
+                        background: active ? '#2563EB' : 'transparent',
+                        color: active ? '#FFFFFF' : '#AAAAAA',
+                      }}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            </Field>
+          )}
+
           {/* Tags */}
           <Field label="Tags">
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: task.tags.length ? 8 : 0 }}>

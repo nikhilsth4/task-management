@@ -37,6 +37,8 @@ interface UIState {
   filterProjectId: string
   pomodoro: PomodoroState
   settings: Settings
+  // ISO date of the last time recurring tasks were generated (checked on app load).
+  lastRecurrenceCheck: string | null
 
   setActiveView: (view: View) => void
   setSelectedTaskId: (id: string | null) => void
@@ -51,6 +53,7 @@ interface UIState {
   completePomodoro: () => void
   updateSettings: (patch: Partial<Settings>) => void
   updatePomodoroSettings: (patch: Partial<Pick<PomodoroState, 'workMinutes' | 'breakMinutes'>>) => void
+  setLastRecurrenceCheck: (date: string) => void
 }
 
 export const useUIStore = create<UIState>()(
@@ -59,6 +62,7 @@ export const useUIStore = create<UIState>()(
       activeView: 'list',
       selectedTaskId: null,
       filterProjectId: 'all',
+      lastRecurrenceCheck: null,
 
       pomodoro: {
         activeTaskId: null,
@@ -136,6 +140,8 @@ export const useUIStore = create<UIState>()(
       updatePomodoroSettings: (patch) => {
         set((s) => ({ pomodoro: { ...s.pomodoro, ...patch } }))
       },
+
+      setLastRecurrenceCheck: (date) => set({ lastRecurrenceCheck: date }),
     }),
     // Persists the entire UI store to localStorage so active view,
     // pomodoro session, and settings survive page reload.

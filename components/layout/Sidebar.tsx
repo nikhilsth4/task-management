@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutList, BarChart2, Settings, Plus, Check, X } from 'lucide-react'
+import { LayoutList, BarChart2, Settings, Plus, Check, X, CheckCheck } from 'lucide-react'
 import { useProjectStore } from '@/store/projects'
 import { useTaskStore } from '@/store/tasks'
 import { useUIStore } from '@/store/ui'
@@ -11,6 +11,7 @@ import { PROJECT_COLORS } from '@/lib/constants'
 
 const NAV = [
   { label: 'Today', href: '/', Icon: LayoutList },
+  { label: 'Completed', href: '/history', Icon: CheckCheck },
   { label: 'Review', href: '/review', Icon: BarChart2 },
   { label: 'Settings', href: '/settings', Icon: Settings },
 ]

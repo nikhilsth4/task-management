@@ -3,6 +3,9 @@
 import { useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useUIStore } from '@/store/ui'
+import { useTaskStore } from '@/store/tasks'
+import { isoToday, generateId, isoNow } from '@/lib/utils'
+import { isDueToday, buildInstance } from '@/lib/recurrence'
 import ViewSwitcher from '@/components/layout/ViewSwitcher'
 import QuickCapture from '@/components/task/QuickCapture'
 import ListView from '@/components/views/ListView'
@@ -15,7 +18,35 @@ import PomodoroOverlay from '@/components/pomodoro/PomodoroOverlay'
 export default function TodayPage() {
   const activeView = useUIStore((s) => s.activeView)
   const selectedTaskId = useUIStore((s) => s.selectedTaskId)
+  const lastRecurrenceCheck = useUIStore((s) => s.lastRecurrenceCheck)
+  const setLastRecurrenceCheck = useUIStore((s) => s.setLastRecurrenceCheck)
+  const tasks = useTaskStore((s) => s.tasks)
+  const addTask = useTaskStore((s) => s.addTask)
+  const updateTask = useTaskStore((s) => s.updateTask)
   const captureRef = useRef<HTMLInputElement>(null)
+
+  // On app load: roll over unfinished tasks and generate recurring instances
+  useEffect(() => {
+    const today = isoToday()
+
+    // Roll over unfinished scheduled tasks from past days to today
+    for (const task of tasks) {
+      if (task.scheduledDate && task.scheduledDate < today && task.status !== 'done' && task.recurrence === 'none') {
+        updateTask(task.id, { scheduledDate: today, status: 'todo', completedAt: null })
+      }
+    }
+
+    // Generate recurring instances once per day
+    if (lastRecurrenceCheck === today) return
+    const templates = tasks.filter((t) => t.recurrence !== 'none')
+    for (const template of templates) {
+      if (isDueToday(template, today)) {
+        const instance = buildInstance(template, today, generateId, isoNow)
+        addTask({ ...instance })
+      }
+    }
+    setLastRecurrenceCheck(today)
+  }, [])
 
   // Focus QuickCapture when / or N pressed outside an input
   useEffect(() => {

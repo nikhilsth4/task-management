@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react' // still used for filterTag
-import { useTaskStore } from '@/store/tasks'
+import { useTaskStore, selectActiveTasks } from '@/store/tasks'
 import { useProjectStore } from '@/store/projects'
 import { useUIStore } from '@/store/ui'
 import { getQuadrantPriority } from '@/lib/utils'
 import TaskCard from '@/components/task/TaskCard'
 
 export default function ListView() {
-  const tasks = useTaskStore((s) => s.tasks)
+  const tasks = selectActiveTasks(useTaskStore((s) => s.tasks))
   const projects = useProjectStore((s) => s.projects)
   const setSelectedTaskId = useUIStore((s) => s.setSelectedTaskId)
   const filterProjectId = useUIStore((s) => s.filterProjectId)
