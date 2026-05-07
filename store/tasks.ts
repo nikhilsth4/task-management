@@ -33,6 +33,7 @@ interface TasksState {
   addTask: (partial: Partial<Task> & { title: string }) => Task
   updateTask: (id: string, patch: Partial<Task>) => void
   deleteTask: (id: string) => void
+  deleteTasksByProject: (projectId: string) => void
   completeTask: (id: string) => void
 }
 
@@ -71,6 +72,10 @@ export const useTaskStore = create<TasksState>()(
 
       deleteTask: (id) => {
         set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) }))
+      },
+
+      deleteTasksByProject: (projectId) => {
+        set((s) => ({ tasks: s.tasks.filter((t) => t.projectId !== projectId) }))
       },
 
       completeTask: (id) => {

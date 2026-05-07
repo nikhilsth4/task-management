@@ -170,19 +170,22 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 ## Part 8: KanbanView
 
 ### Substeps:
-- [ ] 8.1 Create `components/views/KanbanView.tsx` — three columns: To Do / In Progress / Done
-- [ ] 8.2 Render tasks as cards color-coded by `project.color`
-- [ ] 8.3 Implement drag-and-drop between columns using dnd-kit
-- [ ] 8.4 On drop, update `status` in the task store
+- [x] 8.1 Create `components/views/kanban/KanbanView.tsx` — three columns: To Do / In Progress / Done
+- [x] 8.2 Render tasks as cards color-coded by `project.color`
+- [x] 8.3 Implement drag-and-drop between columns using dnd-kit
+- [x] 8.4 On drop, update `status` in the task store
+- [x] 8.5 Add Mark Done / Reopen button to TaskDetail drawer
+- [x] 8.6 Delete project cascades to all its tasks
 
 ### Files:
-`components/views/KanbanView.tsx`
+`components/views/kanban/KanbanView.tsx`, `components/views/kanban/KanbanColumn.tsx`, `components/views/kanban/KanbanCard.tsx`, `components/task/TaskDetail.tsx`, `store/tasks.ts`, `components/layout/Sidebar.tsx`
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [ ] Tasks appear in the correct column based on `status`
-- [ ] Dragging a card to a new column updates `status` in the store
-- [ ] Change reflects in ListView and TaskDetail immediately
-- [ ] Cards are color-coded by their project color
+- [x] Tasks appear in the correct column based on `status`
+- [x] Dragging a card to a new column updates `status` in the store
+- [x] Change reflects in ListView and TaskDetail immediately
+- [x] Cards are color-coded by their project color
+- [x] Deleting a project removes all its tasks
 
 ---
 
