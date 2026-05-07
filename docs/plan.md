@@ -192,23 +192,23 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 ## Part 9: Review Dashboard
 
 ### Substeps:
-- [ ] 9.1 Create `app/review/page.tsx` — weekly progress dashboard
-- [ ] 9.2 Compute: tasks completed today, tasks completed this week
-- [ ] 9.3 Compute: total focus time (pomodoroSessions × 25 min)
-- [ ] 9.4 Compute: completion streak (days in a row with ≥1 task done)
-- [ ] 9.5 Render weekly heatmap (7-day grid, shade by completion count)
-- [ ] 9.6 Render breakdown by project (task count + focus time per project)
+- [x] 9.1 Create `app/review/page.tsx` — weekly progress dashboard
+- [x] 9.2 Compute: tasks completed today, tasks completed this week
+- [x] 9.3 Compute: total focus time (pomodoroSessions × 25 min)
+- [x] 9.4 Compute: completion streak (days in a row with ≥1 task done)
+- [x] 9.5 Render 7-day BarChart (Recharts) with today highlighted
+- [x] 9.6 Render breakdown by project — horizontal BarChart (Recharts)
+- [x] 9.7 Stat cards with sparkline + ↑/↓ trend vs last week
 
 ### Files:
 `app/review/page.tsx`
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [ ] Today's completed task count matches tasks with `completedAt` today
-- [ ] Weekly count matches tasks completed in the last 7 days
-- [ ] Focus time correctly sums `pomodoroSessions × 25` across all tasks
-- [ ] Streak resets when a day has zero completed tasks
-- [ ] Heatmap shading reflects relative completion density
-- [ ] Project breakdown matches tasks filtered by `projectId`
+- [x] Today's completed task count matches tasks with `completedAt` today
+- [x] Weekly count matches tasks completed in the last 7 days
+- [x] Focus time correctly sums `pomodoroSessions × 25` across all tasks
+- [x] Streak resets when a day has zero completed tasks
+- [x] Project breakdown matches tasks filtered by `projectId`
 
 ---
 
