@@ -16,26 +16,26 @@ Before writing any code, Claude outputs:
 
 ### Substeps:
 - [x] 1.1 Enrich this document with detailed substeps and tests
-- [ ] 1.2 Get user approval on the plan
+- [x] 1.2 Get user approval on the plan
 
 ### Tests & Success Criteria:
 - [x] Plan document contains checklist for all 10 parts
 - [x] Each part has specific substeps with checkboxes
 - [x] Each part has test requirements and success criteria defined
-- [ ] User approves the plan
+- [x] User approves the plan
 
 ---
 
 ## Part 2: Project Scaffold & Zustand Stores
 
 ### Substeps:
-- [ ] 2.1 Scaffold project with `create-next-app@latest` (App Router, TypeScript, Tailwind)
-- [ ] 2.2 Install dependencies: `zustand`, `framer-motion`, `@dnd-kit/core`, `@dnd-kit/sortable`, `date-fns`
-- [ ] 2.3 Create `store/tasks.ts` — full Task CRUD + selectors
-- [ ] 2.4 Create `store/projects.ts` — full Project CRUD + selectors
-- [ ] 2.5 Create `store/ui.ts` — active view, selected task ID, pomodoro state
-- [ ] 2.6 Wire localStorage persistence via Zustand `persist` middleware
-- [ ] 2.7 Create `lib/utils.ts` and `lib/constants.ts` with shared helpers and default values
+- [x] 2.1 Scaffold project with `create-next-app@latest`
+- [x] 2.2 Install dependencies: `zustand`, `framer-motion`, `@dnd-kit/core`, `@dnd-kit/sortable`, `date-fns`
+- [x] 2.3 Create `store/tasks.ts` — Task CRUD + selectors
+- [x] 2.4 Create `store/projects.ts` — Project CRUD + selectors
+- [x] 2.5 Create `store/ui.ts` — active view, selected task ID, pomodoro state
+- [x] 2.6 Wire localStorage persistence via Zustand `persist` middleware
+- [x] 2.7 Create `lib/utils.ts` and `lib/constants.ts`
 
 ### Files:
 `store/tasks.ts`, `store/projects.ts`, `store/ui.ts`, `lib/utils.ts`, `lib/constants.ts`
@@ -43,24 +43,24 @@ Before writing any code, Claude outputs:
 ### Tests & Success Criteria (Tier 1 + 2):
 - [ ] Adding a task persists to localStorage and survives page refresh
 - [ ] Updating a task field updates all subscribers immediately
-- [ ] Deleting a task removes it and all its subtasks
-- [ ] `parentId` correctly links subtasks to parents
-- [ ] Completing all subtasks auto-completes the parent task
+- [ ] Deleting a task removes it from the store
 - [ ] Project store CRUD works independently of task store
 - [ ] UI store tracks active view and selected task without side effects
+
+> Note: localStorage persistence and subscriber tests are verified in Part 3 once the UI is wired up.
 
 ---
 
 ## Part 3: QuickCapture + ListView
 
 ### Substeps:
-- [ ] 3.1 Create `components/layout/ViewSwitcher.tsx` — tab bar for Matrix | List | Timeline | Kanban
-- [ ] 3.2 Create `components/layout/Sidebar.tsx` — project list + nav links
-- [ ] 3.3 Create `components/task/QuickCapture.tsx` — always-visible input bar
-- [ ] 3.4 Wire `/` and `N` global hotkeys to focus QuickCapture
-- [ ] 3.5 Create `components/task/TaskCard.tsx` — shared card (title, urgency badge, project color, subtask count)
-- [ ] 3.6 Create `components/views/ListView.tsx` — sorted flat list, subtask toggle `▸`, filter bar
-- [ ] 3.7 Connect `app/(today)/page.tsx` to render ListView with ViewSwitcher
+- [x] 3.1 Create `components/layout/ViewSwitcher.tsx` — tab bar for Matrix | List | Timeline | Kanban
+- [x] 3.2 Create `components/layout/Sidebar.tsx` — project list + nav links
+- [x] 3.3 Create `components/task/QuickCapture.tsx` — always-visible input bar
+- [x] 3.4 Wire `/` and `N` global hotkeys to focus QuickCapture
+- [x] 3.5 Create `components/task/TaskCard.tsx` — shared card (title, urgency badge, project color)
+- [x] 3.6 Create `components/views/ListView.tsx` — sorted flat list, filter bar
+- [x] 3.7 Connect `app/(today)/page.tsx` to render ListView with ViewSwitcher
 
 ### Files:
 `app/(today)/page.tsx`, `components/layout/ViewSwitcher.tsx`, `components/layout/Sidebar.tsx`, `components/task/QuickCapture.tsx`, `components/task/TaskCard.tsx`, `components/views/ListView.tsx`
@@ -70,9 +70,7 @@ Before writing any code, Claude outputs:
 - [ ] Submitting QuickCapture creates a task with `urgency: low`, `importance: low`, `status: todo`
 - [ ] New task appears immediately in ListView without page reload
 - [ ] ListView sorts by Q1 → Q2 → Q3 → Q4 priority correctly
-- [ ] Expanding a task with `▸` shows its subtasks inline
 - [ ] Filter by project narrows the list correctly
-- [ ] TaskCard shows correct subtask count (`completed/total`)
 
 ---
 
@@ -81,20 +79,16 @@ Before writing any code, Claude outputs:
 ### Substeps:
 - [ ] 4.1 Create `components/task/TaskDetail.tsx` — slide-in drawer triggered by clicking a TaskCard
 - [ ] 4.2 Fields: title, notes, urgency, importance, status, scheduledDate, scheduledTime, duration, recurrence, tags, projectId
-- [ ] 4.3 Create `components/task/SubtaskList.tsx` — add/check/delete subtasks inside the drawer
-- [ ] 4.4 Wire drawer open/close to `ui.ts` selected task state
-- [ ] 4.5 Changes save on blur/change (no explicit save button needed)
-- [ ] 4.6 "Start Focus" button in drawer triggers Pomodoro (wired in Part 6)
+- [ ] 4.3 Wire drawer open/close to `ui.ts` selected task state
+- [ ] 4.4 Changes save on blur/change (no explicit save button needed)
+- [ ] 4.5 "Start Focus" button in drawer triggers Pomodoro (wired in Part 6)
 
 ### Files:
-`components/task/TaskDetail.tsx`, `components/task/SubtaskList.tsx`
+`components/task/TaskDetail.tsx`
 
 ### Tests & Success Criteria (Tier 1 + 2):
 - [ ] Clicking a TaskCard opens the drawer with the correct task data
 - [ ] Editing the title updates the task in the store and reflects in ListView immediately
-- [ ] Adding a subtask creates it with correct `parentId` and inherited `projectId`
-- [ ] Checking a subtask marks it done; checking the last subtask completes the parent
-- [ ] Deleting a subtask removes it from the list
 - [ ] Closing and reopening the drawer shows persisted changes
 - [ ] Tag input adds and removes tags correctly
 
@@ -104,20 +98,17 @@ Before writing any code, Claude outputs:
 
 ### Substeps:
 - [ ] 5.1 Create `components/views/MatrixView.tsx` — 2×2 Eisenhower grid
-- [ ] 5.2 Render only top-level tasks in the correct quadrant based on `urgency` + `importance`
-- [ ] 5.3 Expand a card to show/add subtasks (reuse SubtaskList)
-- [ ] 5.4 Implement drag-and-drop between quadrants using dnd-kit
-- [ ] 5.5 On drop, update `urgency` and `importance` in the task store
+- [ ] 5.2 Render tasks in the correct quadrant based on `urgency` + `importance`
+- [ ] 5.3 Implement drag-and-drop between quadrants using dnd-kit
+- [ ] 5.4 On drop, update `urgency` and `importance` in the task store
 
 ### Files:
 `components/views/MatrixView.tsx`
 
 ### Tests & Success Criteria (Tier 1 + 2):
 - [ ] All four quadrants render with correct task placement
-- [ ] Only top-level tasks appear (no subtasks in the grid)
 - [ ] Dragging a card to a new quadrant updates `urgency` and `importance` in the store
 - [ ] The change reflects in ListView and TaskDetail immediately
-- [ ] Expanding a card shows subtasks via SubtaskList
 
 ---
 
@@ -126,7 +117,7 @@ Before writing any code, Claude outputs:
 ### Substeps:
 - [ ] 6.1 Create `components/pomodoro/PomodoroOverlay.tsx` — fullscreen overlay
 - [ ] 6.2 Timer: 25 min work / 5 min break (configurable via ui.ts settings)
-- [ ] 6.3 Display active task title and subtask checklist during focus session
+- [ ] 6.3 Display active task title during focus session
 - [ ] 6.4 On session complete: increment `task.pomodoroSessions`, prompt break
 - [ ] 6.5 While active: dim the rest of the UI (pointer-events-none overlay)
 - [ ] 6.6 Wire "Start Focus" in TaskDetail and TaskCard to activate overlay
@@ -153,13 +144,12 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 
 ### Substeps:
 - [ ] 7.1 Create `components/views/TimelineView.tsx` — hour-by-hour grid (06:00–22:00 default)
-- [ ] 7.2 Render scheduled top-level tasks as blocks sized by `duration`
-- [ ] 7.3 Show subtask mini-checklist inside each scheduled block
-- [ ] 7.4 Create unscheduled tasks side panel
-- [ ] 7.5 Implement drag-and-drop from side panel to time slot using dnd-kit
-- [ ] 7.6 On drop, set `scheduledDate` and `scheduledTime` on the task
-- [ ] 7.7 Implement drag to reschedule already-placed blocks
-- [ ] 7.8 Detect overlapping tasks and render them side by side (equal-width columns within the row)
+- [ ] 7.2 Render scheduled tasks as blocks sized by `duration`
+- [ ] 7.3 Create unscheduled tasks side panel
+- [ ] 7.4 Implement drag-and-drop from side panel to time slot using dnd-kit
+- [ ] 7.5 On drop, set `scheduledDate` and `scheduledTime` on the task
+- [ ] 7.6 Implement drag to reschedule already-placed blocks
+- [ ] 7.7 Detect overlapping tasks and render them side by side
 
 ### Files:
 `components/views/TimelineView.tsx`
@@ -168,10 +158,9 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 - [ ] Scheduled tasks appear in the correct time slot
 - [ ] Block height corresponds to `duration` in minutes
 - [ ] Dragging from unscheduled panel to a slot sets `scheduledDate` and `scheduledTime`
-- [ ] Subtask checklist inside block reflects real-time subtask status
-- [ ] Only top-level tasks appear in the timeline
+- [ ] Only tasks without `scheduledDate` appear in the unscheduled panel
 - [ ] Dragging a placed block to a new slot updates the time correctly
-- [ ] Two tasks scheduled at the same time render side by side at half-width (not on top of each other)
+- [ ] Two tasks scheduled at the same time render side by side at half-width
 - [ ] Three overlapping tasks each render at one-third width
 
 ---
@@ -180,10 +169,9 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 
 ### Substeps:
 - [ ] 8.1 Create `components/views/KanbanView.tsx` — three columns: To Do / In Progress / Done
-- [ ] 8.2 Render top-level tasks as cards color-coded by `project.color`
-- [ ] 8.3 Show subtask checklist inside each Kanban card
-- [ ] 8.4 Implement drag-and-drop between columns using dnd-kit
-- [ ] 8.5 On drop, update `status` in the task store
+- [ ] 8.2 Render tasks as cards color-coded by `project.color`
+- [ ] 8.3 Implement drag-and-drop between columns using dnd-kit
+- [ ] 8.4 On drop, update `status` in the task store
 
 ### Files:
 `components/views/KanbanView.tsx`
@@ -193,7 +181,6 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 - [ ] Dragging a card to a new column updates `status` in the store
 - [ ] Change reflects in ListView and TaskDetail immediately
 - [ ] Cards are color-coded by their project color
-- [ ] Subtask checklist inside each card is interactive
 
 ---
 
