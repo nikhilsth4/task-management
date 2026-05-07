@@ -33,11 +33,14 @@ interface UIState {
   activeView: View
   // ID of the task whose TaskDetail drawer is open; null means drawer is closed.
   selectedTaskId: string | null
+  // 'all' = no filter, '' = inbox, projectId = specific project
+  filterProjectId: string
   pomodoro: PomodoroState
   settings: Settings
 
   setActiveView: (view: View) => void
   setSelectedTaskId: (id: string | null) => void
+  setFilterProjectId: (id: string) => void
 
   // Begins a 25-min work session for the given task.
   startPomodoro: (taskId: string) => void
@@ -54,6 +57,7 @@ export const useUIStore = create<UIState>()(
     (set, get) => ({
       activeView: 'list',
       selectedTaskId: null,
+      filterProjectId: 'all',
 
       pomodoro: {
         activeTaskId: null,
@@ -72,6 +76,8 @@ export const useUIStore = create<UIState>()(
       setActiveView: (view) => set({ activeView: view }),
 
       setSelectedTaskId: (id) => set({ selectedTaskId: id }),
+
+      setFilterProjectId: (id) => set({ filterProjectId: id }),
 
       startPomodoro: (taskId) => {
         set((s) => ({
