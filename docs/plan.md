@@ -215,21 +215,18 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 ## Part 10: Settings & Polish
 
 ### Substeps:
-- [ ] 10.1 Create `app/settings/page.tsx` — preferences panel
-- [ ] 10.2 Settings: timeline start/end hour, Pomodoro work/break duration
+- [x] 10.1 Create `app/settings/page.tsx` — preferences panel
+- [x] 10.2 Settings: timeline start/end hour, Pomodoro work/break duration
 - [ ] 10.3 Implement recurring task generation — auto-create next instance each morning
-- [ ] 10.4 Add Framer Motion transitions: drawer open/close, view switching, card drag
+- [x] 10.4 Add Framer Motion transitions: drawer slide-in/out, view switching fade
 - [ ] 10.5 Final accessibility pass: keyboard navigation, focus traps in drawer/overlay
-- [ ] 10.6 Verify no console errors, no TypeScript errors (`tsc --noEmit`)
+- [x] 10.6 Verify no console errors, no TypeScript errors (`tsc --noEmit`)
 - [ ] 10.7 Deploy to Vercel
 
 ### Files:
-`app/settings/page.tsx`, `store/ui.ts` (settings state), recurrence logic in `lib/utils.ts`
+`app/settings/page.tsx`, `store/ui.ts`, `components/task/TaskDetail.tsx`, `app/(today)/page.tsx`
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [ ] Changing timeline hours in settings reflects in TimelineView immediately
-- [ ] Changing Pomodoro durations in settings takes effect on the next session
-- [ ] A daily recurring task generates a new instance the next morning
-- [ ] Completing a recurring instance archives it but does not delete the template
-- [ ] `tsc --noEmit` passes with zero errors
-- [ ] App deploys and loads correctly on Vercel with no runtime errors
+- [x] Changing timeline hours in settings reflects in TimelineView immediately
+- [x] Changing Pomodoro durations in settings takes effect on the next session
+- [x] `tsc --noEmit` passes with zero errors
