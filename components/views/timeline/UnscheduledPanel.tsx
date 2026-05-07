@@ -18,7 +18,7 @@ interface Props {
 function DraggableUnscheduled({ task, onTaskClick }: { task: Task; onTaskClick: (id: string) => void }) {
   const projects = useProjectStore((s) => s.projects)
   const project = projects.find((p) => p.id === task.projectId)
-  const accent = project ? (COLOR_MAP[project.color] ?? '#E5E7EB') : '#E5E7EB'
+  const accent = project ? (COLOR_MAP[project.color] ?? 'var(--color-hairline)') : 'var(--color-hairline)'
   const done = task.status === 'done'
 
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: task.id })
@@ -29,34 +29,28 @@ function DraggableUnscheduled({ task, onTaskClick }: { task: Task; onTaskClick: 
       {...listeners}
       {...attributes}
       onClick={() => onTaskClick(task.id)}
+      className="flex items-stretch rounded-lg overflow-hidden shrink-0 transition-opacity duration-150"
       style={{
-        display: 'flex', alignItems: 'stretch',
-        background: '#FFFFFF',
-        border: '1px solid #E8E6E0',
-        borderRadius: 7,
-        overflow: 'hidden',
+        background: 'var(--color-stone)',
+        border: '1px solid var(--color-hairline)',
         cursor: isDragging ? 'grabbing' : 'grab',
         opacity: isDragging ? 0.3 : 1,
         boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-        flexShrink: 0,
       }}
     >
-      <span style={{
-        width: 3, flexShrink: 0,
-        background: accent,
-        borderRadius: '2px 0 0 2px',
-      }} />
-      <div style={{ padding: '7px 10px', flex: 1, minWidth: 0 }}>
-        <p style={{
-          margin: 0, fontSize: 12, fontWeight: 500,
-          color: done ? '#AAAAAA' : '#141414',
-          textDecoration: done ? 'line-through' : 'none',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
+      <span className="w-[3px] shrink-0" style={{ background: accent }} />
+      <div className="px-2.5 py-2 flex-1 min-w-0">
+        <p
+          className="m-0 text-[12px] font-medium overflow-hidden text-ellipsis whitespace-nowrap"
+          style={{
+            color: done ? 'var(--color-slate)' : 'var(--color-ink)',
+            textDecoration: done ? 'line-through' : 'none',
+          }}
+        >
           {task.title}
         </p>
         {project && (
-          <p style={{ margin: 0, fontSize: 10, color: '#AAAAAA', marginTop: 1 }}>
+          <p className="m-0 text-[10px] mt-0.5" style={{ color: 'var(--color-slate)' }}>
             {project.title}
           </p>
         )}
@@ -69,34 +63,29 @@ export default function UnscheduledPanel({ tasks, activeId, onTaskClick }: Props
   const { setNodeRef, isOver } = useDroppable({ id: 'unscheduled-panel' })
 
   return (
-    <div ref={setNodeRef} style={{
-      width: 200, flexShrink: 0,
-      borderLeft: '1px solid #E8E6E0',
-      background: isOver ? '#F0F7FF' : '#FAFAF8',
-      transition: 'background 0.12s',
-      display: 'flex', flexDirection: 'column',
-      overflowY: 'auto',
-    }}>
-      <div style={{
-        padding: '10px 12px 6px',
-        fontSize: 10, fontWeight: 700, letterSpacing: '0.08em',
-        color: '#AAAAAA', textTransform: 'uppercase', flexShrink: 0,
-      }}>
+    <div
+      ref={setNodeRef}
+      className="w-[200px] shrink-0 flex flex-col overflow-y-auto transition-colors duration-150"
+      style={{
+        borderLeft: '1px solid var(--color-hairline)',
+        background: isOver ? 'var(--badge-q2-bg)' : 'var(--color-canvas)',
+      }}
+    >
+      <div
+        className="px-3 pt-2.5 pb-1.5 text-[10px] font-bold tracking-widest uppercase shrink-0"
+        style={{ color: 'var(--color-muted)' }}
+      >
         Unscheduled
       </div>
 
-      <div style={{ padding: '0 8px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div className="px-2 pb-3 flex flex-col gap-1.5">
         {tasks.length === 0 ? (
-          <p style={{ margin: '8px 4px', fontSize: 12, color: '#CCCCCC' }}>
+          <p className="mx-1 my-2 text-[12px]" style={{ color: 'var(--color-muted)' }}>
             No unscheduled tasks
           </p>
         ) : (
-          tasks.map((task) => (
-            <DraggableUnscheduled
-              key={task.id}
-              task={task}
-              onTaskClick={onTaskClick}
-            />
+          tasks.filter((t) => t.id !== activeId).map((task) => (
+            <DraggableUnscheduled key={task.id} task={task} onTaskClick={onTaskClick} />
           ))
         )}
       </div>

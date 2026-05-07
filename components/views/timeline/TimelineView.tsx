@@ -10,7 +10,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { useTaskStore, selectActiveTasks } from '@/store/tasks'
+import { useTaskStore } from '@/store/tasks'
 import { useUIStore } from '@/store/ui'
 import { isoToday } from '@/lib/utils'
 import TimeGrid from './TimeGrid'
@@ -100,27 +100,31 @@ export default function TimelineView() {
 
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      <div className="flex flex-col h-full overflow-hidden">
 
         {/* Date nav bar */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 12,
-          padding: '10px 20px', borderBottom: '1px solid #E8E6E0',
-          background: '#FFFFFF', flexShrink: 0,
-        }}>
-          <button onClick={prevDay} style={navBtnStyle}>‹</button>
-          <div style={{ position: 'relative', minWidth: 200, textAlign: 'center' }}>
+        <div
+          className="flex items-center gap-3 px-5 py-2.5 shrink-0"
+          style={{ borderBottom: '1px solid var(--color-hairline)', background: 'var(--color-canvas)' }}
+        >
+          <button
+            onClick={prevDay}
+            className="w-7 h-7 flex items-center justify-center rounded-md text-base cursor-pointer bg-transparent transition-colors hover:bg-stone"
+            style={{ border: '1px solid var(--color-hairline)', color: 'var(--color-slate)', lineHeight: 1 }}
+          >‹</button>
+
+          <div className="relative min-w-[200px] text-center">
             <span
               onClick={() => dateInputRef.current?.showPicker()}
-              style={{
-                fontSize: 14, fontWeight: 500, color: '#141414',
-                cursor: 'pointer', userSelect: 'none',
-              }}
+              className="text-[14px] font-medium cursor-pointer select-none"
+              style={{ color: 'var(--color-ink)' }}
             >
               {displayDate}
               {isToday && (
-                <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 600, color: '#2563EB',
-                  background: '#EFF6FF', padding: '2px 6px', borderRadius: 4 }}>
+                <span
+                  className="ml-2 text-[11px] font-semibold px-1.5 py-0.5 rounded"
+                  style={{ color: 'var(--color-blue-action)', background: 'var(--badge-q2-bg)' }}
+                >
                   TODAY
                 </span>
               )}
@@ -130,17 +134,19 @@ export default function TimelineView() {
               type="date"
               value={viewDate}
               onChange={(e) => e.target.value && setViewDate(e.target.value)}
-              style={{
-                position: 'absolute', opacity: 0, pointerEvents: 'none',
-                width: 0, height: 0, top: 0, left: '50%',
-              }}
+              className="absolute opacity-0 pointer-events-none w-0 h-0 top-0 left-1/2"
             />
           </div>
-          <button onClick={nextDay} style={navBtnStyle}>›</button>
+
+          <button
+            onClick={nextDay}
+            className="w-7 h-7 flex items-center justify-center rounded-md text-base cursor-pointer bg-transparent transition-colors hover:bg-stone"
+            style={{ border: '1px solid var(--color-hairline)', color: 'var(--color-slate)', lineHeight: 1 }}
+          >›</button>
         </div>
 
         {/* Main area */}
-        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <div className="flex flex-1 overflow-hidden">
           <TimeGrid
             scheduledTasks={scheduled}
             startHour={settings.timelineStartHour}
@@ -162,11 +168,4 @@ export default function TimelineView() {
       </DragOverlay>
     </DndContext>
   )
-}
-
-const navBtnStyle: React.CSSProperties = {
-  background: 'none', border: '1px solid #E8E6E0', borderRadius: 6,
-  width: 28, height: 28, cursor: 'pointer', fontSize: 16,
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-  color: '#555', lineHeight: 1,
 }

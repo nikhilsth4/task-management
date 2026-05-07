@@ -18,7 +18,7 @@ interface Props {
 export default function TimeBlock({ task, onTaskClick }: Props) {
   const projects = useProjectStore((s) => s.projects)
   const project = projects.find((p) => p.id === task.projectId)
-  const accent = project ? (COLOR_MAP[project.color] ?? '#E5E7EB') : '#E5E7EB'
+  const accent = project ? (COLOR_MAP[project.color] ?? 'var(--color-hairline)') : 'var(--color-hairline)'
   const done = task.status === 'done'
 
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: task.id })
@@ -29,34 +29,28 @@ export default function TimeBlock({ task, onTaskClick }: Props) {
       {...listeners}
       {...attributes}
       onClick={() => onTaskClick(task.id)}
+      className="h-full rounded-md px-2 py-1 overflow-hidden flex flex-col justify-center transition-opacity duration-150"
       style={{
-        height: '100%',
-        background: '#FFFFFF',
+        background: 'var(--color-stone)',
         border: `1px solid ${accent}33`,
         borderLeft: `3px solid ${accent}`,
-        borderRadius: 6,
-        padding: '4px 8px',
         cursor: isDragging ? 'grabbing' : 'grab',
-        overflow: 'hidden',
         boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
         opacity: isDragging ? 0.3 : 1,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, overflow: 'hidden' }}>
-        <p style={{
-          margin: 0, fontSize: 12, fontWeight: 500,
-          color: done ? '#AAAAAA' : '#141414',
-          textDecoration: done ? 'line-through' : 'none',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          lineHeight: 1.3, flex: 1, minWidth: 0,
-        }}>
+      <div className="flex items-baseline gap-1.5 overflow-hidden">
+        <p
+          className="m-0 text-[12px] font-medium overflow-hidden text-ellipsis whitespace-nowrap leading-snug flex-1 min-w-0"
+          style={{
+            color: done ? 'var(--color-slate)' : 'var(--color-ink)',
+            textDecoration: done ? 'line-through' : 'none',
+          }}
+        >
           {task.title}
         </p>
         {task.scheduledTime && (
-          <span style={{ fontSize: 10, color: '#AAAAAA', flexShrink: 0 }}>
+          <span className="text-[10px] shrink-0" style={{ color: 'var(--color-slate)' }}>
             {formatTimeRange(task.scheduledTime, task.duration)}
           </span>
         )}

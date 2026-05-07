@@ -14,7 +14,6 @@ interface Props {
   onSlotClick: (hour: number, minute: number) => void
 }
 
-// Returns pixel height for a duration in minutes. 1 hour = 60px.
 function durationToPx(minutes: number): number {
   return Math.max(28, (minutes / 60) * 60)
 }
@@ -33,14 +32,12 @@ function buildOverlapGroups(tasks: Task[]): Map<string, { colIdx: number; totalC
   const sorted = [...tasks].sort((a, b) =>
     timeToMins(a.scheduledTime!) - timeToMins(b.scheduledTime!)
   )
-
   const layout = new Map<string, { colIdx: number; totalCols: number }>()
   const groups: OverlapGroup[] = []
 
   for (const task of sorted) {
     const startMins = timeToMins(task.scheduledTime!)
     const endMins = startMins + (task.duration ?? 30)
-
     let placed = false
     for (const group of groups) {
       if (startMins < group.endMins) {
@@ -50,22 +47,20 @@ function buildOverlapGroups(tasks: Task[]): Map<string, { colIdx: number; totalC
         break
       }
     }
-    if (!placed) {
-      groups.push({ tasks: [task], endMins })
-    }
+    if (!placed) groups.push({ tasks: [task], endMins })
   }
 
   for (const group of groups) {
     const total = group.tasks.length
-    group.tasks.forEach((t, i) => {
-      layout.set(t.id, { colIdx: i, totalCols: total })
-    })
+    group.tasks.forEach((t, i) => layout.set(t.id, { colIdx: i, totalCols: total }))
   }
 
   return layout
 }
 
-function DroppableSlot({ hour, minute, onSlotClick }: { hour: number; minute: number; onSlotClick: (h: number, m: number) => void }) {
+function DroppableSlot({ hour, minute, onSlotClick }: {
+  hour: number; minute: number; onSlotClick: (h: number, m: number) => void
+}) {
   const id = `slot-${hour}-${minute}`
   const { isOver, setNodeRef } = useDroppable({ id })
   const isHalfHour = minute === 30
@@ -77,28 +72,26 @@ function DroppableSlot({ hour, minute, onSlotClick }: { hour: number; minute: nu
       ref={setNodeRef}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      className="h-[30px] relative transition-colors duration-100"
       style={{
-        height: 30, position: 'relative',
-        borderTop: isHalfHour ? '1px dashed #F0EEE8' : '1px solid #ECEAE4',
-        background: isOver ? '#EFF6FF' : hovered ? '#FAFAF8' : 'transparent',
-        transition: 'background 0.1s',
+        borderTop: isHalfHour
+          ? '1px dashed var(--color-hairline)'
+          : '1px solid var(--color-hairline)',
+        background: isOver ? 'var(--badge-q2-bg)' : hovered ? 'var(--color-stone)' : 'transparent',
       }}
     >
       {hovered && !isOver && (
         <button
           onClick={() => onSlotClick(hour, minute)}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] cursor-pointer z-10"
           style={{
-            position: 'absolute', top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-            display: 'flex', alignItems: 'center', gap: 4,
-            background: '#FFFFFF', border: '1px solid #E0DED8',
-            borderRadius: 5, padding: '2px 8px 2px 5px',
-            fontSize: 11, color: '#555', cursor: 'pointer',
+            background: 'var(--color-canvas)',
+            border: '1px solid var(--color-hairline)',
+            color: 'var(--color-slate)',
             boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-            zIndex: 10,
           }}
         >
-          <span style={{ fontSize: 14, lineHeight: 1, color: '#2563EB', fontWeight: 300 }}>+</span>
+          <span className="text-[13px] leading-none" style={{ color: 'var(--color-blue-action)' }}>+</span>
           {label}
         </button>
       )}
@@ -111,34 +104,28 @@ export default function TimeGrid({ scheduledTasks, startHour, endHour, activeId,
   const layout = buildOverlapGroups(scheduledTasks)
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', position: 'relative', minWidth: 0 }}>
-      <div style={{ position: 'relative' }}>
+    <div className="flex-1 overflow-y-auto relative min-w-0">
+      <div className="relative">
         {hours.map((hour) => (
-          <div key={hour} style={{ display: 'flex' }}>
+          <div key={hour} className="flex">
             {/* Hour label */}
-            <div style={{
-              width: 52, flexShrink: 0,
-              paddingTop: 4, paddingRight: 10,
-              textAlign: 'right',
-              fontSize: 11, color: '#AAAAAA', fontWeight: 500,
-              userSelect: 'none',
-            }}>
+            <div
+              className="w-[52px] shrink-0 pt-1 pr-2.5 text-right text-[11px] font-medium select-none"
+              style={{ color: 'var(--color-muted)' }}
+            >
               {String(hour).padStart(2, '0')}:00
             </div>
 
-            {/* Two 30-min droppable slots stacked */}
-            <div style={{ flex: 1, position: 'relative' }}>
+            {/* Two 30-min slots */}
+            <div className="flex-1 relative">
               <DroppableSlot hour={hour} minute={0} onSlotClick={onSlotClick} />
               <DroppableSlot hour={hour} minute={30} onSlotClick={onSlotClick} />
             </div>
           </div>
         ))}
 
-        {/* Placed task blocks — absolutely positioned over the grid */}
-        <div style={{
-          position: 'absolute', top: 0, left: 52, right: 0, bottom: 0,
-          pointerEvents: 'none',
-        }}>
+        {/* Absolutely positioned task blocks */}
+        <div className="absolute top-0 right-0 bottom-0 pointer-events-none" style={{ left: 52 }}>
           {scheduledTasks.map((task) => {
             if (!task.scheduledTime) return null
             const startMins = timeToMins(task.scheduledTime)
@@ -154,15 +141,13 @@ export default function TimeGrid({ scheduledTasks, startHour, endHour, activeId,
             return (
               <div
                 key={task.id}
+                className="absolute pointer-events-auto transition-opacity duration-150"
                 style={{
-                  position: 'absolute',
                   top,
                   height,
                   left: `calc(${leftPct}% + 2px)`,
                   width: `calc(${widthPct}% - 4px)`,
-                  pointerEvents: 'auto',
                   opacity: task.id === activeId ? 0.35 : 1,
-                  transition: 'opacity 0.15s',
                 }}
               >
                 <TimeBlock task={task} onTaskClick={onTaskClick} />
