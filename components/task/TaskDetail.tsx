@@ -41,6 +41,7 @@ interface FieldErrors {
 export default function TaskDetail() {
   const selectedTaskId = useUIStore((s) => s.selectedTaskId)
   const setSelectedTaskId = useUIStore((s) => s.setSelectedTaskId)
+  const startPomodoro = useUIStore((s) => s.startPomodoro)
   const task = useTaskStore((s) => s.tasks.find((t) => t.id === selectedTaskId))
   const updateTask = useTaskStore((s) => s.updateTask)
   const deleteTask = useTaskStore((s) => s.deleteTask)
@@ -344,15 +345,14 @@ export default function TaskDetail() {
             {confirmDelete ? 'Confirm delete' : 'Delete'}
           </button>
 
-          {/* Start Focus — wired in Part 6 */}
           <button
-            disabled
+            onClick={() => { startPomodoro(task!.id); setSelectedTaskId(null) }}
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
               background: '#141414', color: '#FFFFFF',
               border: 'none', borderRadius: 6,
               padding: '7px 14px', fontSize: 12, fontWeight: 500,
-              cursor: 'not-allowed', opacity: 0.4,
+              cursor: 'pointer',
             }}
           >
             <Timer size={13} />
