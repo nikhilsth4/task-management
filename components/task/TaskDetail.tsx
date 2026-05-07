@@ -345,6 +345,32 @@ export default function TaskDetail() {
             {confirmDelete ? 'Confirm delete' : 'Delete'}
           </button>
 
+          {task!.status !== 'done' ? (
+            <button
+              onClick={() => { completeTask(task!.id); setSelectedTaskId(null) }}
+              style={{
+                background: '#16A34A', color: '#FFFFFF',
+                border: 'none', borderRadius: 6,
+                padding: '7px 14px', fontSize: 12, fontWeight: 500,
+                cursor: 'pointer',
+              }}
+            >
+              Mark Done
+            </button>
+          ) : (
+            <button
+              onClick={() => updateTask(task!.id, { status: 'todo', completedAt: null })}
+              style={{
+                background: 'none', color: '#6B7280',
+                border: '1px solid #E8E6E0', borderRadius: 6,
+                padding: '7px 14px', fontSize: 12, fontWeight: 500,
+                cursor: 'pointer',
+              }}
+            >
+              Reopen
+            </button>
+          )}
+
           <button
             onClick={() => { startPomodoro(task!.id); setSelectedTaskId(null) }}
             style={{
@@ -356,7 +382,7 @@ export default function TaskDetail() {
             }}
           >
             <Timer size={13} />
-            Start Focus
+            Focus
           </button>
         </div>
       </aside>
