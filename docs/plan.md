@@ -344,7 +344,7 @@ The app is visually redesigned to follow the Cohere-inspired system documented i
 - [x] WCAG AA contrast met for quadrant badge pairs in both themes
 - [x] Space Grotesk renders for display elements; Geist Sans for body
 - [x] Recharts chart axes and tooltips use CSS var colors in both themes
-- [ ] `tsc --noEmit` passes with zero errors
+- [x] `tsc --noEmit` passes with zero errors
 
 ---
 
