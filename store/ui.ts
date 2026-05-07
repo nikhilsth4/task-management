@@ -50,6 +50,7 @@ interface UIState {
   // Work session → starts a break. Break → resets fully.
   completePomodoro: () => void
   updateSettings: (patch: Partial<Settings>) => void
+  updatePomodoroSettings: (patch: Partial<Pick<PomodoroState, 'workMinutes' | 'breakMinutes'>>) => void
 }
 
 export const useUIStore = create<UIState>()(
@@ -130,6 +131,10 @@ export const useUIStore = create<UIState>()(
 
       updateSettings: (patch) => {
         set((s) => ({ settings: { ...s.settings, ...patch } }))
+      },
+
+      updatePomodoroSettings: (patch) => {
+        set((s) => ({ pomodoro: { ...s.pomodoro, ...patch } }))
       },
     }),
     // Persists the entire UI store to localStorage so active view,
