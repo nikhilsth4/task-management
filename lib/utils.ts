@@ -32,3 +32,13 @@ export function isoToday(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
+export function formatTimeRange(scheduledTime: string, duration: number | null): string {
+  const [h, m] = scheduledTime.split(':').map(Number)
+  const start = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+  if (!duration) return start
+  const totalMins = h * 60 + m + duration
+  const endH = Math.floor(totalMins / 60) % 24
+  const endM = totalMins % 60
+  return `${start} – ${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`
+}
+

@@ -3,6 +3,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { generateId, isoNow } from '@/lib/utils'
+import { DEFAULT_TASK_DURATION } from '@/lib/constants'
 
 export type Recurrence = 'none' | 'daily' | 'weekly' | 'weekdays' | 'custom'
 export type Status = 'todo' | 'in_progress' | 'done'
@@ -51,7 +52,7 @@ export const useTaskStore = create<TasksState>()(
           status: partial.status ?? 'todo',
           scheduledDate: partial.scheduledDate ?? null,
           scheduledTime: partial.scheduledTime ?? null,
-          duration: partial.duration ?? null,
+          duration: partial.duration ?? DEFAULT_TASK_DURATION,
           recurrence: partial.recurrence ?? 'none',
           pomodoroSessions: partial.pomodoroSessions ?? 0,
           tags: partial.tags ?? [],

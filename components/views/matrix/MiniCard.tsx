@@ -2,6 +2,7 @@
 
 import { type Task } from '@/store/tasks'
 import { useProjectStore } from '@/store/projects'
+import { formatTimeRange } from '@/lib/utils'
 
 const COLOR_MAP: Record<string, string> = {
   blue: '#3B82F6', rose: '#F43F5E', green: '#22C55E', amber: '#F59E0B',
@@ -39,9 +40,16 @@ export default function MiniCard({ task }: { task: Task }) {
         }}>
           {task.title}
         </p>
-        {project && (
-          <p style={{ margin: '2px 0 0', fontSize: 11, color: '#AAAAAA' }}>{project.title}</p>
-        )}
+        <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
+          {project && (
+            <p style={{ margin: 0, fontSize: 11, color: '#AAAAAA' }}>{project.title}</p>
+          )}
+          {task.scheduledTime && (
+            <p style={{ margin: 0, fontSize: 11, color: '#AAAAAA' }}>
+              {formatTimeRange(task.scheduledTime, task.duration)}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   )
