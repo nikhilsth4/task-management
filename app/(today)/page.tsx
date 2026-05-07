@@ -6,6 +6,7 @@ import ViewSwitcher from '@/components/layout/ViewSwitcher'
 import QuickCapture from '@/components/task/QuickCapture'
 import ListView from '@/components/views/ListView'
 import MatrixView from '@/components/views/matrix/MatrixView'
+import TimelineView from '@/components/views/timeline/TimelineView'
 import TaskDetail from '@/components/task/TaskDetail'
 import PomodoroOverlay from '@/components/pomodoro/PomodoroOverlay'
 
@@ -31,12 +32,15 @@ export default function TodayPage() {
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
       <QuickCapture ref={captureRef} />
       <ViewSwitcher />
-      <main style={{ flex: 1, overflowY: 'auto', background: '#F7F6F3' }}>
+      <main style={{
+        flex: 1, background: '#F7F6F3',
+        overflowY: activeView === 'timeline' ? 'hidden' : 'auto',
+        display: activeView === 'timeline' ? 'flex' : 'block',
+        flexDirection: 'column',
+      }}>
         {activeView === 'list' && <ListView />}
         {activeView === 'matrix' && <MatrixView />}
-        {activeView === 'timeline' && (
-          <div style={{ padding: 24, color: '#BBBBBB', fontSize: 14 }}>Timeline view — coming in Part 7</div>
-        )}
+        {activeView === 'timeline' && <TimelineView />}
         {activeView === 'kanban' && (
           <div style={{ padding: 24, color: '#BBBBBB', fontSize: 14 }}>Kanban view — coming in Part 8</div>
         )}

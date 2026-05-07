@@ -4,7 +4,7 @@ import { Timer } from 'lucide-react'
 import { type Task } from '@/store/tasks'
 import { useProjectStore } from '@/store/projects'
 import { useUIStore } from '@/store/ui'
-import { getQuadrant } from '@/lib/utils'
+import { getQuadrant, formatTimeRange } from '@/lib/utils'
 
 interface TaskCardProps {
   task: Task
@@ -91,6 +91,11 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
           <span style={{ fontSize: 12, color: '#AAAAAA' }}>
             {project ? project.title : 'Inbox'}
           </span>
+          {task.scheduledTime && (
+            <span style={{ fontSize: 12, color: '#AAAAAA', marginLeft: 'auto' }}>
+              {formatTimeRange(task.scheduledTime, task.duration)}
+            </span>
+          )}
         </div>
       </div>
 
@@ -120,3 +125,4 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
     </div>
   )
 }
+
