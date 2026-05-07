@@ -23,10 +23,10 @@ type QuadrantId =
   | 'not_urgent_not_important'
 
 const QUADRANTS: QuadrantConfig[] = [
-  { id: 'not_urgent_important',     label: 'Q2 · Schedule',  sublabel: 'Important, not urgent',        accent: '#2563EB', faint: '#EFF6FF' },
-  { id: 'urgent_important',         label: 'Q1 · Do First',  sublabel: 'Urgent & important',           accent: '#DC2626', faint: '#FEF2F2' },
-  { id: 'not_urgent_not_important', label: 'Q4 · Eliminate', sublabel: 'Neither urgent nor important', accent: '#6B7280', faint: '#F9FAFB' },
-  { id: 'urgent_not_important',     label: 'Q3 · Delegate',  sublabel: 'Urgent, not important',        accent: '#D97706', faint: '#FFFBEB' },
+  { id: 'not_urgent_important',     label: 'Q2 · Schedule',  sublabel: 'Important, not urgent',        badgeBg: 'var(--badge-q2-bg)', badgeText: 'var(--badge-q2-text)' },
+  { id: 'urgent_important',         label: 'Q1 · Do First',  sublabel: 'Urgent & important',           badgeBg: 'var(--badge-q1-bg)', badgeText: 'var(--badge-q1-text)' },
+  { id: 'not_urgent_not_important', label: 'Q4 · Eliminate', sublabel: 'Neither urgent nor important', badgeBg: 'var(--badge-q4-bg)', badgeText: 'var(--badge-q4-text)' },
+  { id: 'urgent_not_important',     label: 'Q3 · Delegate',  sublabel: 'Urgent, not important',        badgeBg: 'var(--badge-q3-bg)', badgeText: 'var(--badge-q3-text)' },
 ]
 
 const QUADRANT_MAP: Record<QuadrantId, { urgency: Urgency; importance: Importance }> = {
@@ -76,15 +76,15 @@ export default function MatrixView() {
 
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gridTemplateRows: '1fr 1fr',
-        gap: 1,
-        background: '#E8E6E0',
-        flex: 1,
-        height: '100%',
-      }}>
+      <div
+        className="grid flex-1 h-full"
+        style={{
+          gridTemplateColumns: '1fr 1fr',
+          gridTemplateRows: '1fr 1fr',
+          gap: 1,
+          background: 'var(--color-hairline)',
+        }}
+      >
         {QUADRANTS.map((q) => (
           <Quadrant
             key={q.id}

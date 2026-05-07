@@ -8,8 +8,8 @@ export interface QuadrantConfig {
   id: string
   label: string
   sublabel: string
-  accent: string
-  faint: string
+  badgeBg: string
+  badgeText: string
 }
 
 interface QuadrantProps {
@@ -25,32 +25,29 @@ export default function Quadrant({ config, tasks, activeId, onCardClick }: Quadr
   return (
     <div
       ref={setNodeRef}
-      style={{
-        background: isOver ? config.faint : '#FAFAF9',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'background 0.15s',
-        overflow: 'hidden',
-      }}
+      className="flex flex-col overflow-hidden transition-colors duration-150"
+      style={{ background: isOver ? 'var(--color-stone)' : 'var(--color-canvas)' }}
     >
       {/* Header */}
-      <div style={{
-        padding: '12px 16px 8px',
-        borderBottom: `2px solid ${config.accent}20`,
-        flexShrink: 0,
-      }}>
-        <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: config.accent, letterSpacing: '0.02em' }}>
+      <div
+        className="px-4 pt-3 pb-2 shrink-0"
+        style={{ borderBottom: '1px solid var(--color-hairline)' }}
+      >
+        <span
+          className="text-[11px] font-semibold px-1.5 py-0.5 rounded"
+          style={{ background: config.badgeBg, color: config.badgeText }}
+        >
           {config.label}
-        </p>
-        <p style={{ margin: '2px 0 0', fontSize: 11, color: '#AAAAAA' }}>
+        </span>
+        <p className="m-0 mt-1 text-[11px]" style={{ color: 'var(--color-slate)' }}>
           {config.sublabel}
         </p>
       </div>
 
       {/* Cards */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1.5">
         {tasks.length === 0 ? (
-          <p style={{ fontSize: 12, color: '#CCCCCC', textAlign: 'center', marginTop: 24 }}>
+          <p className="text-[12px] text-center mt-6" style={{ color: 'var(--color-muted)' }}>
             Drop tasks here
           </p>
         ) : (

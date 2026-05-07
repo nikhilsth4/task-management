@@ -15,37 +15,34 @@ export default function MiniCard({ task }: { task: Task }) {
   const done = task.status === 'done'
 
   return (
-    <div style={{
-      background: '#FFFFFF',
-      border: '1px solid #E8E6E0',
-      borderRadius: 7,
-      padding: '8px 10px',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-      display: 'flex',
-      alignItems: 'stretch',
-      overflow: 'hidden',
-    }}>
-      <span style={{
-        width: 3, flexShrink: 0,
-        background: project ? (COLOR_MAP[project.color] ?? '#E5E7EB') : '#E5E7EB',
-        borderRadius: '2px 0 0 2px',
-        marginRight: 8,
-      }} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{
-          margin: 0, fontSize: 13, fontWeight: 500,
-          color: done ? '#AAAAAA' : '#141414',
-          textDecoration: done ? 'line-through' : 'none',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
+    <div
+      className="flex items-stretch rounded-lg overflow-hidden"
+      style={{
+        background: 'var(--color-stone)',
+        border: '1px solid var(--color-hairline)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+      }}
+    >
+      <span
+        className="w-[3px] shrink-0"
+        style={{ background: project ? (COLOR_MAP[project.color] ?? 'var(--color-hairline)') : 'var(--color-hairline)' }}
+      />
+      <div className="flex-1 px-2.5 py-2 min-w-0">
+        <p
+          className="m-0 text-[13px] font-medium overflow-hidden text-ellipsis whitespace-nowrap leading-snug"
+          style={{
+            color: done ? 'var(--color-slate)' : 'var(--color-ink)',
+            textDecoration: done ? 'line-through' : 'none',
+          }}
+        >
           {task.title}
         </p>
-        <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
+        <div className="flex gap-2 mt-0.5">
           {project && (
-            <p style={{ margin: 0, fontSize: 11, color: '#AAAAAA' }}>{project.title}</p>
+            <p className="m-0 text-[11px]" style={{ color: 'var(--color-slate)' }}>{project.title}</p>
           )}
           {task.scheduledTime && (
-            <p style={{ margin: 0, fontSize: 11, color: '#AAAAAA' }}>
+            <p className="m-0 text-[11px]" style={{ color: 'var(--color-slate)' }}>
               {formatTimeRange(task.scheduledTime, task.duration)}
             </p>
           )}
