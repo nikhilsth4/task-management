@@ -261,3 +261,128 @@ Completing a recurring task immediately spawns the next instance scheduled for t
 - [x] Unfinished past tasks roll to today with status reset to todo
 - [x] Views show only today + unscheduled tasks
 - [x] Completed page groups tasks by date with completion time shown
+
+---
+
+## Part 12: Design System Redesign + Dark/Light Mode
+
+### Design Reference: `docs/DESIGN.md`
+The app is visually redesigned to follow the Cohere-inspired system documented in DESIGN.md. White canvas main area, near-black sidebar, soft stone card surfaces, coral accent chips, pill-shaped primary buttons, flat elevation with thin borders. Dark mode uses deep green-black surfaces. All inline styles are replaced with Tailwind utility classes.
+
+### Color Tokens (from DESIGN.md):
+| Role | Light | Dark |
+|---|---|---|
+| Page background | `#ffffff` (canvas white) | `#071829` (dark navy) |
+| Card surface | `#eeece7` (soft stone) | `#0d1f2d` |
+| Card border | `#f2f2f2` | `#1a2e3f` |
+| Rule / divider | `#d9d9dd` | `#1e3040` |
+| Primary text | `#212121` (ink) | `#f0f0f0` |
+| Secondary text | `#93939f` (muted slate) | `#6b7f8f` |
+| Sidebar background | `#17171c` (near-black) | `#0a0a0f` |
+| Sidebar active item | `#2a2a32` | `#141420` |
+| Accent / badge | `#ff7759` (coral) | `#ff7759` |
+| Link / active blue | `#1863dc` (action blue) | `#4c87e8` |
+| Focus ring | `#4c6ee6` | `#4c6ee6` |
+
+### Typography (from DESIGN.md — using available fallbacks):
+- **Display / headings**: `Space Grotesk`, falling back to `Inter`, `ui-sans-serif`
+- **Body / UI**: `Inter`, falling back to `ui-sans-serif`, `system-ui`
+- **Mono labels**: `JetBrains Mono`, falling back to `ui-monospace`
+- Load via `next/font/google` in `app/layout.tsx`
+
+### Shape Scale (from DESIGN.md):
+- `rounded` (4px) — inputs, small utility elements
+- `rounded-lg` (8px) — task cards, chips, small media
+- `rounded-2xl` (16px) — drawers, panels, modals
+- `rounded-[22px]` — major surface cards (timeline blocks, kanban cards)
+- `rounded-full` (pill) — primary CTA buttons, status badges
+
+### Component Translations:
+| DESIGN.md component | App equivalent |
+|---|---|
+| `button-primary` (pill, near-black) | "Start Focus", "Add task", primary actions |
+| `button-secondary` (text link) | Cancel, secondary drawer actions |
+| `button-pill-outline` (outlined pill) | View switcher tabs, filter chips |
+| `research-table` (rule-separated rows) | ListView task rows |
+| `agent-console-card` (dark panel) | PomodoroOverlay, dark sidebar |
+| `blog-filter-chip` (coral chip) | Urgency/quadrant badges |
+| `product-card` (stone card) | TaskCard, KanbanCard |
+| `dark-feature-band` (deep green/navy) | Dark mode surface color |
+
+### Tailwind Dark Mode Setup:
+```css
+/* globals.css */
+@import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+```
+`dark` class toggled on `<html>` by Zustand theme state.
+
+### Substeps:
+- [ ] 12.1 Install `Space Grotesk` and `JetBrains Mono` via `next/font/google`; configure `@theme` in `globals.css` with full color + font tokens; set up `@variant dark`
+- [ ] 12.2 Add `theme: 'light' | 'dark' | 'system'` to `store/ui.ts`; sync `dark` class on `<html>` via `useEffect` in `app/layout.tsx`; honor `prefers-color-scheme` as default
+- [ ] 12.3 Redesign `Sidebar.tsx` — near-black bg, Space Grotesk "Focus" wordmark, pill-outline nav links, coral dot for active project, sun/moon theme toggle in footer
+- [ ] 12.4 Redesign `TaskCard.tsx` — soft stone surface, 8px radius, thin `#d9d9dd` border, coral quadrant chip, rule-separated metadata row, pill focus button
+- [ ] 12.5 Redesign `TaskDetail.tsx` — white/dark panel, Space Grotesk section headings, pill primary actions, outlined secondary actions, `rounded-2xl` drawer
+- [ ] 12.6 Redesign `QuickCapture.tsx` — white input bar, thin border, pill "Add" button, Inter 14px placeholder
+- [ ] 12.7 Redesign `ViewSwitcher.tsx` — pill-outline tabs, coral underline for active tab
+- [ ] 12.8 Redesign `ListView.tsx` — research-table style: rule-separated rows, no card boxing, date/chip column right-aligned
+- [ ] 12.9 Redesign `MatrixView.tsx` — white quadrant panels with thin borders, stone card surface, coral Q1 chip
+- [ ] 12.10 Redesign Timeline files — stone time blocks with `rounded-[22px]`, dark navy unscheduled panel header, coral drop zone highlight
+- [ ] 12.11 Redesign Kanban files — stone cards, near-black column headers, coral status chip on in-progress
+- [ ] 12.12 Redesign `PomodoroOverlay.tsx` — dark navy full-screen, white Space Grotesk timer, coral progress ring or bar
+- [ ] 12.13 Redesign `app/review/page.tsx` — white canvas, stone stat cards, coral bar highlights, thin rule separators
+- [ ] 12.14 Redesign `app/history/page.tsx` and `app/settings/page.tsx` — research-table rows, pill-outline controls
+- [ ] 12.15 Verify no hardcoded hex values remain; run `tsc --noEmit`; confirm both themes render correctly
+
+### Files:
+`app/globals.css`, `app/layout.tsx`, `store/ui.ts`, `components/layout/Sidebar.tsx`, `components/layout/ViewSwitcher.tsx`, `components/task/TaskCard.tsx`, `components/task/TaskDetail.tsx`, `components/task/QuickCapture.tsx`, `components/views/ListView.tsx`, `components/views/matrix/MatrixView.tsx`, `components/views/timeline/TimelineView.tsx`, `components/views/timeline/TimeGrid.tsx`, `components/views/timeline/TimeBlock.tsx`, `components/views/timeline/UnscheduledPanel.tsx`, `components/views/kanban/KanbanView.tsx`, `components/views/kanban/KanbanColumn.tsx`, `components/views/kanban/KanbanCard.tsx`, `components/pomodoro/PomodoroOverlay.tsx`, `app/review/page.tsx`, `app/history/page.tsx`, `app/settings/page.tsx`
+
+### Tests & Success Criteria (Tier 1 + 2):
+- [ ] Theme toggle switches light ↔ dark; preference survives page reload
+- [ ] `prefers-color-scheme: dark` users get dark mode on first visit
+- [ ] No hardcoded hex color values remain in any component file
+- [ ] Coral quadrant chips, pill buttons, and rule-separated rows visible in both themes
+- [ ] Space Grotesk renders for all headings; Inter for body text
+- [ ] Recharts charts readable in both themes
+- [ ] `tsc --noEmit` passes with zero errors
+
+---
+
+## Part 13: Mobile Responsive
+
+### Responsive Strategy:
+Three breakpoints using Tailwind's built-in prefixes — `sm:` (≥640px), `md:` (≥768px), `lg:` (≥1024px). Since all components will be converted to Tailwind classes in Part 12, responsive variants are added in the same pass or as a follow-up. Sidebar becomes a slide-in drawer on mobile with a hamburger trigger. All touch targets are ≥44px (`min-h-11 min-w-11`).
+
+### Breakpoints:
+| Name | Width | Sidebar behavior |
+|---|---|---|
+| Mobile | < 640px | Hidden; hamburger → full-width drawer overlay |
+| Tablet | 640–1024px | Icon-only collapsed sidebar (48px wide) |
+| Desktop | > 1024px | Full sidebar (200px) — current behavior |
+
+### Substeps:
+- [ ] 13.1 Verify Tailwind breakpoint prefixes (`sm:`, `md:`, `lg:`) work correctly in the build; add any custom breakpoints to `globals.css` `@theme` if needed
+- [ ] 13.2 Refactor `Sidebar.tsx` — add hamburger button + mobile drawer overlay; icon-only mode at tablet
+- [ ] 13.3 Make `app/layout.tsx` root flex layout respond to sidebar state on mobile
+- [ ] 13.4 Make `ViewSwitcher.tsx` scroll horizontally on mobile (overflow-x: auto, no wrap)
+- [ ] 13.5 Make `QuickCapture.tsx` full-width on all breakpoints
+- [ ] 13.6 Make `ListView.tsx` task cards full-width with adequate tap target height
+- [ ] 13.7 `MatrixView.tsx` — 2×2 grid stacks to 1×4 on mobile (vertical scroll)
+- [ ] 13.8 `TimelineView.tsx` — unscheduled panel collapses to a bottom sheet on mobile
+- [ ] 13.9 `KanbanView.tsx` — columns scroll horizontally on mobile (snap scroll)
+- [ ] 13.10 `TaskDetail.tsx` drawer goes full-screen on mobile
+- [ ] 13.11 `PomodoroOverlay.tsx` — verify timer is readable and buttons tappable on mobile
+- [ ] 13.12 Review and Settings pages reflow to single column on mobile
+
+### Files:
+`app/globals.css`, `app/layout.tsx`, `components/layout/Sidebar.tsx`, `components/layout/ViewSwitcher.tsx`, `components/task/QuickCapture.tsx`, `components/task/TaskDetail.tsx`, `components/views/ListView.tsx`, `components/views/matrix/MatrixView.tsx`, `components/views/timeline/TimelineView.tsx`, `components/views/timeline/UnscheduledPanel.tsx`, `components/views/kanban/KanbanView.tsx`, `components/pomodoro/PomodoroOverlay.tsx`, `app/review/page.tsx`, `app/settings/page.tsx`
+
+### Tests & Success Criteria (Tier 1 + 2):
+- [ ] At 375px width: sidebar hidden, hamburger visible, drawer opens/closes
+- [ ] At 768px width: icon-only sidebar visible, tooltips on hover
+- [ ] ViewSwitcher tabs never wrap or overflow at any width
+- [ ] All interactive elements meet 44px minimum touch target
+- [ ] TaskDetail opens full-screen on mobile, slide-in drawer on desktop
+- [ ] Kanban columns horizontally scrollable on mobile with snap behavior
+- [ ] Matrix stacks to vertical list on mobile
+- [ ] No horizontal page overflow at any breakpoint

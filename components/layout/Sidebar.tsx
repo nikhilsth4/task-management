@@ -1,25 +1,32 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutList, BarChart2, Settings, Plus, Check, X, CheckCheck } from 'lucide-react'
+import { LayoutList, BarChart2, Settings, Plus, Check, X, CheckCheck, Sun, Moon, Monitor } from 'lucide-react'
 import { useProjectStore } from '@/store/projects'
 import { useTaskStore } from '@/store/tasks'
-import { useUIStore } from '@/store/ui'
+import { useUIStore, type Theme } from '@/store/ui'
 import { PROJECT_COLORS } from '@/lib/constants'
+import { applyTheme } from './ThemeSync'
 
 const NAV = [
-  { label: 'Today', href: '/', Icon: LayoutList },
-  { label: 'Completed', href: '/history', Icon: CheckCheck },
-  { label: 'Review', href: '/review', Icon: BarChart2 },
-  { label: 'Settings', href: '/settings', Icon: Settings },
+  { label: 'Today',     href: '/',        Icon: LayoutList },
+  { label: 'Completed', href: '/history',  Icon: CheckCheck },
+  { label: 'Review',    href: '/review',   Icon: BarChart2 },
+  { label: 'Settings',  href: '/settings', Icon: Settings },
 ]
 
 const COLOR_MAP: Record<string, string> = {
   blue: '#3B82F6', rose: '#F43F5E', green: '#22C55E', amber: '#F59E0B',
   purple: '#A855F7', cyan: '#06B6D4', orange: '#F97316', teal: '#14B8A6',
 }
+
+const THEME_CYCLES: { value: Theme; Icon: React.ElementType; label: string }[] = [
+  { value: 'light',  Icon: Sun,     label: 'Light'  },
+  { value: 'system', Icon: Monitor, label: 'System' },
+  { value: 'dark',   Icon: Moon,    label: 'Dark'   },
+]
 
 export default function Sidebar() {
   const pathname = usePathname()
@@ -29,6 +36,8 @@ export default function Sidebar() {
   const deleteTasksByProject = useTaskStore((s) => s.deleteTasksByProject)
   const filterProjectId = useUIStore((s) => s.filterProjectId)
   const setFilterProjectId = useUIStore((s) => s.setFilterProjectId)
+  const theme = useUIStore((s) => s.theme)
+  const updateTheme = useUIStore((s) => s.updateTheme)
 
   const [showForm, setShowForm] = useState(false)
   const [newTitle, setNewTitle] = useState('')
@@ -45,43 +54,28 @@ export default function Sidebar() {
   }
 
   return (
-    <aside style={{
-      width: 200,
-      flexShrink: 0,
-      background: '#141414',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 0,
-      padding: '24px 0',
-      height: '100%',
-    }}>
-      {/* App name */}
-      <div style={{ padding: '0 20px 24px', borderBottom: '1px solid #2A2A2A' }}>
-        <span style={{ color: '#FFFFFF', fontSize: 13, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+    <aside className="w-[200px] shrink-0 flex flex-col h-full" style={{ background: 'var(--color-sidebar)' }}>
+
+      {/* Wordmark */}
+      <div className="px-5 py-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <span className="text-[13px] font-semibold tracking-widest uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-display)' }}>
           Focus
         </span>
       </div>
 
       {/* Nav */}
-      <nav style={{ padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <nav className="px-3 py-4 flex flex-col gap-0.5">
         {NAV.map(({ label, href, Icon }) => {
           const active = pathname === href
           return (
             <Link
               key={href}
               href={href}
+              className="flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] no-underline transition-colors"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                padding: '8px 10px',
-                borderRadius: 6,
-                textDecoration: 'none',
-                background: active ? '#2A2A2A' : 'transparent',
-                color: active ? '#FFFFFF' : '#888888',
-                fontSize: 13,
+                background: active ? 'var(--color-sidebar-active)' : 'transparent',
+                color: active ? '#ffffff' : 'var(--color-sidebar-text)',
                 fontWeight: active ? 500 : 400,
-                transition: 'background 0.15s, color 0.15s',
               }}
             >
               <Icon size={14} strokeWidth={active ? 2 : 1.5} />
@@ -92,15 +86,16 @@ export default function Sidebar() {
       </nav>
 
       {/* Projects */}
-      <div style={{ padding: '0 12px', marginTop: 8, flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px', marginBottom: 8 }}>
-          <p style={{ color: '#444', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+      <div className="px-3 mt-2 flex-1 flex flex-col min-h-0">
+        <div className="flex items-center justify-between px-2.5 mb-2">
+          <p className="text-[10px] font-semibold tracking-widest uppercase m-0" style={{ color: 'rgba(255,255,255,0.25)' }}>
             Projects
           </p>
           <button
             onClick={() => setShowForm((v) => !v)}
             title="New project"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#555', padding: 2, display: 'flex' }}
+            className="border-none cursor-pointer p-0.5 flex transition-colors"
+            style={{ background: 'transparent', color: 'rgba(255,255,255,0.3)' }}
           >
             <Plus size={13} />
           </button>
@@ -108,56 +103,48 @@ export default function Sidebar() {
 
         {/* Inline new project form */}
         {showForm && (
-          <form onSubmit={handleAddProject} style={{ padding: '0 4px', marginBottom: 8 }}>
+          <form onSubmit={handleAddProject} className="px-1 mb-2">
             <input
               autoFocus
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="Project name"
+              className="w-full rounded-md px-2 py-1.5 text-[12px] outline-none mb-1.5"
               style={{
-                width: '100%', boxSizing: 'border-box',
-                background: '#1E1E1E', border: '1px solid #333',
-                borderRadius: 5, padding: '5px 8px',
-                fontSize: 12, color: '#FFFFFF', outline: 'none',
-                marginBottom: 6, fontFamily: 'inherit',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#ffffff',
+                fontFamily: 'inherit',
               }}
             />
-            {/* Color picker */}
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 8 }}>
+            <div className="flex gap-1 flex-wrap mb-2">
               {PROJECT_COLORS.map((c) => (
                 <button
                   key={c}
                   type="button"
                   onClick={() => setNewColor(c)}
                   title={c}
+                  className="w-4 h-4 rounded-full cursor-pointer p-0 shrink-0 border-2 transition-all"
                   style={{
-                    width: 16, height: 16, borderRadius: '50%',
                     background: COLOR_MAP[c] ?? '#888',
-                    border: newColor === c ? '2px solid #FFFFFF' : '2px solid transparent',
-                    cursor: 'pointer', padding: 0, flexShrink: 0,
+                    borderColor: newColor === c ? '#ffffff' : 'transparent',
                   }}
                 />
               ))}
             </div>
-            <div style={{ display: 'flex', gap: 6 }}>
+            <div className="flex gap-1.5">
               <button
                 type="submit"
-                style={{
-                  flex: 1, background: '#2A2A2A', border: '1px solid #333',
-                  color: '#FFFFFF', borderRadius: 5, padding: '5px 0',
-                  fontSize: 11, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                }}
+                className="flex-1 rounded-md py-1 text-[11px] cursor-pointer flex items-center justify-center gap-1 transition-colors"
+                style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff' }}
               >
                 <Check size={11} /> Add
               </button>
               <button
                 type="button"
                 onClick={() => { setShowForm(false); setNewTitle(''); setNewColor('blue') }}
-                style={{
-                  background: 'none', border: '1px solid #333',
-                  color: '#666', borderRadius: 5, padding: '5px 10px',
-                  fontSize: 11, cursor: 'pointer',
-                }}
+                className="rounded-md px-2.5 py-1 text-[11px] cursor-pointer transition-colors"
+                style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}
               >
                 Cancel
               </button>
@@ -165,48 +152,51 @@ export default function Sidebar() {
           </form>
         )}
 
-        {/* All Projects */}
-        <FilterItem
-          label="All Projects"
-          active={filterProjectId === 'all'}
-          onClick={() => setFilterProjectId('all')}
-          dot={null}
-        />
-        {/* Inbox */}
-        <FilterItem
-          label="Inbox"
-          active={filterProjectId === ''}
-          onClick={() => setFilterProjectId(filterProjectId === '' ? 'all' : '')}
-          dot="#6B7280"
-        />
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <FilterItem label="All Projects" active={filterProjectId === 'all'} onClick={() => setFilterProjectId('all')} dot={null} />
+          <FilterItem label="Inbox" active={filterProjectId === ''} onClick={() => setFilterProjectId(filterProjectId === '' ? 'all' : '')} dot="#6B7280" />
+          {projects.map((p) => (
+            <ProjectItem
+              key={p.id}
+              label={p.title}
+              active={filterProjectId === p.id}
+              dot={COLOR_MAP[p.color] ?? '#888'}
+              onClick={() => setFilterProjectId(filterProjectId === p.id ? 'all' : p.id)}
+              onDelete={() => {
+                deleteTasksByProject(p.id)
+                deleteProject(p.id)
+                if (filterProjectId === p.id) setFilterProjectId('all')
+              }}
+            />
+          ))}
+        </div>
+      </div>
 
-        {projects.map((p) => (
-          <ProjectItem
-            key={p.id}
-            label={p.title}
-            active={filterProjectId === p.id}
-            dot={COLOR_MAP[p.color] ?? '#888'}
-            onClick={() => setFilterProjectId(filterProjectId === p.id ? 'all' : p.id)}
-            onDelete={() => {
-              deleteTasksByProject(p.id)
-              deleteProject(p.id)
-              if (filterProjectId === p.id) setFilterProjectId('all')
-            }}
-          />
-        ))}
+      {/* Theme toggle */}
+      <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="flex items-center justify-between rounded-lg p-0.5" style={{ background: 'rgba(255,255,255,0.05)' }}>
+          {THEME_CYCLES.map(({ value, Icon, label }) => (
+            <button
+              key={value}
+              onClick={() => { updateTheme(value); applyTheme(value) }}
+              title={label}
+              className="flex-1 flex items-center justify-center py-1.5 rounded-md cursor-pointer border-none transition-all"
+              style={{
+                background: theme === value ? 'rgba(255,255,255,0.15)' : 'transparent',
+                color: theme === value ? '#ffffff' : 'rgba(255,255,255,0.3)',
+              }}
+            >
+              <Icon size={13} />
+            </button>
+          ))}
+        </div>
       </div>
     </aside>
   )
 }
 
-function ProjectItem({
-  label, active, dot, onClick, onDelete,
-}: {
-  label: string
-  active: boolean
-  dot: string
-  onClick: () => void
-  onDelete: () => void
+function ProjectItem({ label, active, dot, onClick, onDelete }: {
+  label: string; active: boolean; dot: string; onClick: () => void; onDelete: () => void
 }) {
   const [hovered, setHovered] = useState(false)
 
@@ -214,23 +204,16 @@ function ProjectItem({
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{
-        display: 'flex', alignItems: 'center',
-        borderRadius: 6,
-        background: active ? '#2A2A2A' : 'transparent',
-      }}
+      className="flex items-center rounded-md"
+      style={{ background: active ? 'var(--color-sidebar-active)' : 'transparent' }}
     >
       <button
         onClick={onClick}
-        style={{
-          flex: 1, display: 'flex', alignItems: 'center', gap: 8,
-          padding: '6px 10px', borderRadius: 6,
-          background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
-          minWidth: 0,
-        }}
+        className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-md border-none cursor-pointer text-left min-w-0"
+        style={{ background: 'transparent' }}
       >
-        <span style={{ width: 6, height: 6, borderRadius: '50%', background: dot, flexShrink: 0 }} />
-        <span style={{ color: active ? '#FFFFFF' : '#888', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: dot }} />
+        <span className="text-[13px] overflow-hidden text-ellipsis whitespace-nowrap" style={{ color: active ? '#ffffff' : 'var(--color-sidebar-text)' }}>
           {label}
         </span>
       </button>
@@ -238,11 +221,8 @@ function ProjectItem({
         <button
           onClick={(e) => { e.stopPropagation(); onDelete() }}
           title="Delete project"
-          style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            padding: '4px 8px 4px 2px', color: active ? '#888' : '#666',
-            display: 'flex', alignItems: 'center', flexShrink: 0,
-          }}
+          className="border-none cursor-pointer pr-2 pl-0.5 flex items-center shrink-0 transition-colors"
+          style={{ background: 'transparent', color: 'rgba(255,255,255,0.3)' }}
         >
           <X size={12} />
         </button>
@@ -251,29 +231,20 @@ function ProjectItem({
   )
 }
 
-function FilterItem({
-  label, active, onClick, dot,
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-  dot: string | null
+function FilterItem({ label, active, onClick, dot }: {
+  label: string; active: boolean; onClick: () => void; dot: string | null
 }) {
   return (
     <button
       onClick={onClick}
-      style={{
-        width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-        padding: '6px 10px', borderRadius: 6,
-        background: active ? '#2A2A2A' : 'transparent',
-        border: 'none', cursor: 'pointer', textAlign: 'left',
-      }}
+      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md border-none cursor-pointer text-left transition-colors"
+      style={{ background: active ? 'var(--color-sidebar-active)' : 'transparent' }}
     >
       {dot !== null
-        ? <span style={{ width: 6, height: 6, borderRadius: '50%', background: dot, flexShrink: 0 }} />
-        : <span style={{ width: 6, flexShrink: 0 }} />
+        ? <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: dot }} />
+        : <span className="w-1.5 shrink-0" />
       }
-      <span style={{ color: active ? '#FFFFFF' : '#888', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span className="text-[13px] overflow-hidden text-ellipsis whitespace-nowrap" style={{ color: active ? '#ffffff' : 'var(--color-sidebar-text)' }}>
         {label}
       </span>
     </button>

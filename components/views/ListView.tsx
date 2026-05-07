@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react' // still used for filterTag
+import { useState } from 'react'
 import { useTaskStore } from '@/store/tasks'
 import { useProjectStore } from '@/store/projects'
 import { useUIStore } from '@/store/ui'
@@ -31,26 +31,24 @@ export default function ListView() {
 
   const showFilters = projects.length > 0 || allTags.length > 0
 
+  const selectStyle: React.CSSProperties = {
+    padding: '5px 10px',
+    fontSize: 12,
+    border: '1px solid var(--color-hairline)',
+    borderRadius: 6,
+    background: 'var(--color-stone)',
+    color: 'var(--color-ink)',
+    outline: 'none',
+    cursor: 'pointer',
+  }
+
   return (
-    <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 720, width: '100%' }}>
+    <div className="px-6 py-6 flex flex-col gap-4 max-w-2xl w-full">
       {/* Filter bar */}
       {showFilters && (
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div className="flex gap-2 flex-wrap">
           {projects.length > 0 && (
-            <select
-              value={filterProjectId}
-              onChange={(e) => setFilterProjectId(e.target.value)}
-              style={{
-                padding: '6px 10px',
-                fontSize: 12,
-                border: '1px solid #E8E6E0',
-                borderRadius: 6,
-                background: '#FFFFFF',
-                color: '#555',
-                outline: 'none',
-                cursor: 'pointer',
-              }}
-            >
+            <select value={filterProjectId} onChange={(e) => setFilterProjectId(e.target.value)} style={selectStyle}>
               <option value="all">All projects</option>
               <option value="">Inbox</option>
               {projects.map((p) => (
@@ -59,20 +57,7 @@ export default function ListView() {
             </select>
           )}
           {allTags.length > 0 && (
-            <select
-              value={filterTag}
-              onChange={(e) => setFilterTag(e.target.value)}
-              style={{
-                padding: '6px 10px',
-                fontSize: 12,
-                border: '1px solid #E8E6E0',
-                borderRadius: 6,
-                background: '#FFFFFF',
-                color: '#555',
-                outline: 'none',
-                cursor: 'pointer',
-              }}
-            >
+            <select value={filterTag} onChange={(e) => setFilterTag(e.target.value)} style={selectStyle}>
               <option value="all">All tags</option>
               {allTags.map((tag) => (
                 <option key={tag} value={tag}>{tag}</option>
@@ -84,11 +69,13 @@ export default function ListView() {
 
       {/* Task list */}
       {filtered.length === 0 ? (
-        <div style={{ paddingTop: 80, textAlign: 'center' }}>
-          <p style={{ fontSize: 14, color: '#BBBBBB', margin: 0 }}>No tasks yet — capture one above.</p>
+        <div className="pt-20 text-center">
+          <p className="text-[14px] m-0" style={{ color: 'var(--color-muted)' }}>
+            No tasks yet — capture one above.
+          </p>
         </div>
       ) : (
-        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <ul className="list-none m-0 p-0 flex flex-col gap-2">
           {filtered.map((task) => (
             <li key={task.id}>
               <TaskCard task={task} onClick={() => setSelectedTaskId(task.id)} />

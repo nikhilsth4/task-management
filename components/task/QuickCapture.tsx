@@ -16,45 +16,26 @@ const QuickCapture = forwardRef<HTMLInputElement>(function QuickCapture(_, ref) 
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 12,
-      padding: '14px 24px',
-      background: '#FFFFFF',
-      borderBottom: '1px solid #E8E6E0',
-    }}>
-      <span style={{ color: '#BBBBBB', fontSize: 16, userSelect: 'none' }}>+</span>
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-center gap-3 px-6 py-3.5 shrink-0"
+      style={{ background: 'var(--color-canvas)', borderBottom: '1px solid var(--color-hairline)' }}
+    >
+      <span className="text-base select-none" style={{ color: 'var(--color-muted)' }}>+</span>
       <input
         ref={ref}
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Capture a task…  press / or N to focus"
-        style={{
-          flex: 1,
-          background: 'none',
-          border: 'none',
-          outline: 'none',
-          fontSize: 14,
-          color: '#141414',
-          fontFamily: 'var(--font-geist-sans)',
-        }}
+        className="flex-1 bg-transparent border-none outline-none text-[14px]"
+        style={{ color: 'var(--color-ink)', fontFamily: 'inherit' }}
       />
       {value.trim() && (
         <button
           type="submit"
-          style={{
-            background: '#141414',
-            color: '#FFFFFF',
-            border: 'none',
-            borderRadius: 6,
-            padding: '6px 14px',
-            fontSize: 12,
-            fontWeight: 500,
-            cursor: 'pointer',
-            letterSpacing: '0.02em',
-          }}
+          className="border-none rounded-full px-4 py-1.5 text-[12px] font-medium cursor-pointer tracking-wide transition-opacity hover:opacity-80"
+          style={{ background: 'var(--color-ink)', color: 'var(--color-canvas)' }}
         >
           Add
         </button>

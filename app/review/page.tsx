@@ -118,7 +118,7 @@ export default function ReviewPage() {
   const focusTrend = stats.thisWeekFocusTime - stats.lastWeekFocusTime
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px', background: '#F7F6F3' }}>
+    <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px', background: 'var(--color-canvas)' }}>
       <h1 style={{ margin: '0 0 24px', fontSize: 20, fontWeight: 600, color: '#141414' }}>
         Weekly Review
       </h1>

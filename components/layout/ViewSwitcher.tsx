@@ -3,10 +3,10 @@
 import { useUIStore, type View } from '@/store/ui'
 
 const TABS: { label: string; view: View }[] = [
-  { label: 'List', view: 'list' },
-  { label: 'Matrix', view: 'matrix' },
+  { label: 'List',     view: 'list'     },
+  { label: 'Matrix',   view: 'matrix'   },
   { label: 'Timeline', view: 'timeline' },
-  { label: 'Kanban', view: 'kanban' },
+  { label: 'Kanban',   view: 'kanban'   },
 ]
 
 export default function ViewSwitcher() {
@@ -14,23 +14,21 @@ export default function ViewSwitcher() {
   const setActiveView = useUIStore((s) => s.setActiveView)
 
   return (
-    <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid #E8E6E0', padding: '0 24px', background: '#F7F6F3' }}>
+    <div
+      className="flex shrink-0 px-6"
+      style={{ borderBottom: '1px solid var(--color-hairline)', background: 'var(--color-canvas)' }}
+    >
       {TABS.map(({ label, view }) => {
         const active = activeView === view
         return (
           <button
             key={view}
             onClick={() => setActiveView(view)}
+            className="px-4 py-3 text-[13px] bg-transparent border-none cursor-pointer transition-colors"
             style={{
-              padding: '12px 16px',
-              fontSize: 13,
+              color: active ? 'var(--color-ink)' : 'var(--color-slate)',
               fontWeight: active ? 600 : 400,
-              color: active ? '#141414' : '#999',
-              background: 'none',
-              border: 'none',
-              borderBottom: active ? '2px solid #141414' : '2px solid transparent',
-              cursor: 'pointer',
-              transition: 'color 0.15s',
+              borderBottom: active ? '2px solid var(--color-ink)' : '2px solid transparent',
               marginBottom: -1,
             }}
           >

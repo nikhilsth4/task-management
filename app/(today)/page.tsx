@@ -50,7 +50,7 @@ export default function TodayPage() {
       <QuickCapture ref={captureRef} />
       <ViewSwitcher />
       <main style={{
-        flex: 1, background: '#F7F6F3',
+        flex: 1, background: 'var(--color-canvas)',
         overflowY: (activeView === 'timeline' || activeView === 'kanban') ? 'hidden' : 'auto',
         display: (activeView === 'timeline' || activeView === 'kanban') ? 'flex' : 'block',
         flexDirection: 'column',

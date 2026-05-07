@@ -11,11 +11,11 @@ interface TaskCardProps {
   onClick: () => void
 }
 
-const QUADRANT_STYLE: Record<string, { bg: string; color: string; label: string }> = {
-  urgent_important:           { bg: '#FEE2E2', color: '#DC2626', label: 'Q1 · Urgent' },
-  not_urgent_important:       { bg: '#DBEAFE', color: '#2563EB', label: 'Q2 · Important' },
-  urgent_not_important:       { bg: '#FEF3C7', color: '#D97706', label: 'Q3 · Urgent' },
-  not_urgent_not_important:   { bg: '#F3F4F6', color: '#6B7280', label: 'Q4' },
+const QUADRANT_BADGE: Record<string, { bg: string; color: string; label: string }> = {
+  urgent_important:           { bg: 'var(--badge-q1-bg)', color: 'var(--badge-q1-text)', label: 'Q1 · Urgent'     },
+  not_urgent_important:       { bg: 'var(--badge-q2-bg)', color: 'var(--badge-q2-text)', label: 'Q2 · Important'  },
+  urgent_not_important:       { bg: 'var(--badge-q3-bg)', color: 'var(--badge-q3-text)', label: 'Q3 · Delegate'   },
+  not_urgent_not_important:   { bg: 'var(--badge-q4-bg)', color: 'var(--badge-q4-text)', label: 'Q4'              },
 }
 
 const COLOR_MAP: Record<string, string> = {
@@ -28,7 +28,7 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
   const startPomodoro = useUIStore((s) => s.startPomodoro)
   const project = projects.find((p) => p.id === task.projectId)
   const quadrant = getQuadrant(task.urgency, task.importance)
-  const q = QUADRANT_STYLE[quadrant]
+  const badge = QUADRANT_BADGE[quadrant]
   const done = task.status === 'done'
 
   return (
@@ -37,87 +37,66 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
       role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick() }}
+      className="group w-full flex items-stretch rounded-lg overflow-hidden cursor-pointer text-left transition-all duration-150"
       style={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'stretch',
-        background: '#FFFFFF',
-        border: '1px solid #E8E6E0',
-        borderRadius: 8,
-        cursor: 'pointer',
-        textAlign: 'left',
-        overflow: 'hidden',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-        transition: 'box-shadow 0.15s, border-color 0.15s',
-        position: 'relative',
+        background: 'var(--color-stone)',
+        border: '1px solid var(--color-hairline)',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'
-        e.currentTarget.style.borderColor = '#D0CEC8'
-        const btn = e.currentTarget.querySelector<HTMLElement>('[data-focus-btn]')
-        if (btn) btn.style.opacity = '1'
+        e.currentTarget.style.transform = 'translateY(-1px)'
+        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.10)'
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'
-        e.currentTarget.style.borderColor = '#E8E6E0'
-        const btn = e.currentTarget.querySelector<HTMLElement>('[data-focus-btn]')
-        if (btn) btn.style.opacity = '0'
+        e.currentTarget.style.transform = 'translateY(0)'
+        e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.04)'
       }}
     >
       {/* Project color strip */}
-      <span style={{
-        width: 3, flexShrink: 0,
-        background: project ? (COLOR_MAP[project.color] ?? '#E5E7EB') : '#E5E7EB',
-      }} />
+      <span
+        className="w-[3px] shrink-0"
+        style={{ background: project ? (COLOR_MAP[project.color] ?? 'var(--color-hairline)') : 'var(--color-hairline)' }}
+      />
 
-      <div style={{ flex: 1, padding: '12px 14px' }}>
-        <p style={{
-          margin: 0, fontSize: 14, fontWeight: 500,
-          color: done ? '#AAAAAA' : '#141414',
-          textDecoration: done ? 'line-through' : 'none',
-          lineHeight: 1.4,
-        }}>
+      <div className="flex-1 px-4 py-3 min-w-0">
+        <p
+          className="m-0 text-[14px] font-medium leading-snug"
+          style={{
+            color: done ? 'var(--color-slate)' : 'var(--color-ink)',
+            textDecoration: done ? 'line-through' : 'none',
+          }}
+        >
           {task.title}
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-          <span style={{
-            fontSize: 11, fontWeight: 600, padding: '2px 7px',
-            borderRadius: 4, background: q.bg, color: q.color,
-            letterSpacing: '0.02em',
-          }}>
-            {q.label}
+        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+          <span
+            className="text-[11px] font-semibold px-1.5 py-0.5 rounded"
+            style={{ background: badge.bg, color: badge.color }}
+          >
+            {badge.label}
           </span>
-          <span style={{ fontSize: 12, color: '#AAAAAA' }}>
+          <span className="text-[12px]" style={{ color: 'var(--color-slate)' }}>
             {project ? project.title : 'Inbox'}
           </span>
           {task.scheduledTime && (
-            <span style={{ fontSize: 12, color: '#AAAAAA', marginLeft: 'auto' }}>
+            <span className="text-[12px] ml-auto" style={{ color: 'var(--color-slate)' }}>
               {formatTimeRange(task.scheduledTime, task.duration)}
             </span>
           )}
         </div>
       </div>
 
-      {/* Start Focus button — revealed on hover */}
+      {/* Focus button — revealed on hover */}
       <button
         data-focus-btn
         onClick={(e) => { e.stopPropagation(); startPomodoro(task.id) }}
         title="Start focus session"
+        className="opacity-0 group-hover:opacity-100 self-center mr-3 border rounded-md p-1.5 cursor-pointer flex items-center transition-opacity duration-150"
         style={{
-          opacity: 0,
-          transition: 'opacity 0.15s',
-          alignSelf: 'center',
-          marginRight: 12,
-          background: 'none',
-          border: '1px solid #E8E6E0',
-          borderRadius: 6,
-          padding: '5px 7px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          color: '#888',
-          flexShrink: 0,
+          background: 'transparent',
+          borderColor: 'var(--color-hairline)',
+          color: 'var(--color-slate)',
         }}
       >
         <Timer size={13} />
@@ -125,4 +104,3 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
     </div>
   )
 }
-

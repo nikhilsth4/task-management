@@ -10,6 +10,7 @@ import {
 } from '@/lib/constants'
 
 export type View = 'list' | 'matrix' | 'timeline' | 'kanban'
+export type Theme = 'light' | 'dark' | 'system'
 
 interface PomodoroState {
   activeTaskId: string | null
@@ -39,10 +40,12 @@ interface UIState {
   settings: Settings
   // ISO date of the last time recurring tasks were generated (checked on app load).
   lastRecurrenceCheck: string | null
+  theme: Theme
 
   setActiveView: (view: View) => void
   setSelectedTaskId: (id: string | null) => void
   setFilterProjectId: (id: string) => void
+  updateTheme: (theme: Theme) => void
 
   // Begins a 25-min work session for the given task.
   startPomodoro: (taskId: string) => void
@@ -63,6 +66,7 @@ export const useUIStore = create<UIState>()(
       selectedTaskId: null,
       filterProjectId: 'all',
       lastRecurrenceCheck: null,
+      theme: 'light' as Theme,
 
       pomodoro: {
         activeTaskId: null,
@@ -83,6 +87,8 @@ export const useUIStore = create<UIState>()(
       setSelectedTaskId: (id) => set({ selectedTaskId: id }),
 
       setFilterProjectId: (id) => set({ filterProjectId: id }),
+
+      updateTheme: (theme) => set({ theme }),
 
       startPomodoro: (taskId) => {
         set((s) => ({

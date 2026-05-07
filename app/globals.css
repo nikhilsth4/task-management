@@ -1,7 +1,62 @@
 @import "tailwindcss";
+@variant dark (&:where(html.dark, html.dark *));
 
+/* Font aliases — inline so var() chains resolve correctly */
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans:    var(--font-geist-sans);
+  --font-display: var(--font-space-grotesk);
+  --font-mono:    var(--font-jetbrains-mono);
+}
+
+/* Color tokens — NOT inline, so utilities reference var() and dark overrides work */
+@theme {
+  --color-canvas:         #f7f6f3;
+  --color-stone:          #eeece7;
+  --color-ink:            #212121;
+  --color-slate:          #93939f;
+  --color-hairline:       #d9d9dd;
+  --color-rule:           #e5e7eb;
+  --color-sidebar:        #17171c;
+  --color-sidebar-active: #2a2a32;
+  --color-sidebar-text:   #aaaaaa;
+  --color-coral:          #ff7759;
+  --color-blue-action:    #1863dc;
+  --color-muted:          #cccccc;
+  --color-surface:        #fafaf9;
+
+  /* Quadrant badge tokens — WCAG AA contrast guaranteed */
+  --badge-q1-bg:   #fff0ed;
+  --badge-q1-text: #b83d1e;
+  --badge-q2-bg:   #e8f0fe;
+  --badge-q2-text: #1246a8;
+  --badge-q3-bg:   #fef3e2;
+  --badge-q3-text: #8a5a00;
+  --badge-q4-bg:   #f0f0f0;
+  --badge-q4-text: #4a4a4a;
+}
+
+/* Dark mode overrides — html.dark beats :root specificity from @theme */
+html.dark {
+  --color-canvas:         #071829;
+  --color-stone:          #0d1f2d;
+  --color-ink:            #f0f0f0;
+  --color-slate:          #6b7f8f;
+  --color-hairline:       #1a2e3f;
+  --color-rule:           #1e3040;
+  --color-sidebar:        #0a0a0f;
+  --color-sidebar-active: #141420;
+  --color-sidebar-text:   #666666;
+  --color-muted:          #444444;
+  --color-surface:        #0d1f2d;
+
+  --badge-q1-bg:   rgba(255,119,89,0.18);
+  --badge-q1-text: #ff9e87;
+  --badge-q2-bg:   rgba(24,99,220,0.18);
+  --badge-q2-text: #7aaaf7;
+  --badge-q3-bg:   rgba(245,158,11,0.18);
+  --badge-q3-text: #f5c454;
+  --badge-q4-bg:   rgba(147,147,159,0.18);
+  --badge-q4-text: #b0b0bc;
 }
 
 *, *::before, *::after {
