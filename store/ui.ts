@@ -66,7 +66,7 @@ export const useUIStore = create<UIState>()(
       selectedTaskId: null,
       filterProjectId: 'all',
       lastRecurrenceCheck: null,
-      theme: 'light' as Theme,
+      theme: 'system' as Theme,
 
       pomodoro: {
         activeTaskId: null,

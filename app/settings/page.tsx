@@ -9,14 +9,13 @@ export default function SettingsPage() {
   const updatePomodoro = useUIStore((s) => s.updatePomodoroSettings)
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px', background: 'var(--color-canvas)' }}>
-      <h1 style={{ margin: '0 0 24px', fontSize: 20, fontWeight: 600, color: '#141414' }}>
+    <div className="flex-1 overflow-y-auto px-8 py-7" style={{ background: 'var(--color-canvas)' }}>
+      <h1 className="m-0 mb-6 text-[20px] font-semibold" style={{ color: 'var(--color-ink)' }}>
         Settings
       </h1>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 480 }}>
+      <div className="flex flex-col gap-4 max-w-[480px]">
 
-        {/* Timeline */}
         <Section title="Timeline">
           <Row label="Start hour">
             <HourSelect
@@ -34,28 +33,27 @@ export default function SettingsPage() {
           </Row>
         </Section>
 
-        {/* Pomodoro */}
         <Section title="Pomodoro">
           <Row label="Work duration">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className="flex items-center gap-2">
               <NumberInput
                 value={pomodoro.workMinutes}
                 min={1}
                 max={120}
                 onChange={(v) => updatePomodoro({ workMinutes: v })}
               />
-              <span style={{ fontSize: 12, color: '#AAAAAA' }}>minutes</span>
+              <span className="text-[12px]" style={{ color: 'var(--color-slate)' }}>minutes</span>
             </div>
           </Row>
           <Row label="Break duration">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className="flex items-center gap-2">
               <NumberInput
                 value={pomodoro.breakMinutes}
                 min={1}
                 max={60}
                 onChange={(v) => updatePomodoro({ breakMinutes: v })}
               />
-              <span style={{ fontSize: 12, color: '#AAAAAA' }}>minutes</span>
+              <span className="text-[12px]" style={{ color: 'var(--color-slate)' }}>minutes</span>
             </div>
           </Row>
         </Section>
@@ -65,36 +63,31 @@ export default function SettingsPage() {
   )
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{
-      background: '#FFFFFF', border: '1px solid #E8E6E0',
-      borderRadius: 10, overflow: 'hidden',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-    }}>
-      <div style={{
-        padding: '10px 16px', borderBottom: '1px solid #F0EEE8',
-        fontSize: 11, fontWeight: 700, color: '#AAAAAA',
-        letterSpacing: '0.07em', textTransform: 'uppercase',
-      }}>
+    <div
+      className="rounded-[10px] overflow-hidden"
+      style={{
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-hairline)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+      }}
+    >
+      <div
+        className="px-4 py-2.5 text-[11px] font-bold tracking-[0.07em] uppercase"
+        style={{ borderBottom: '1px solid var(--color-hairline)', color: 'var(--color-muted)' }}
+      >
         {title}
       </div>
-      <div style={{ padding: '4px 0' }}>
-        {children}
-      </div>
+      <div className="py-1">{children}</div>
     </div>
   )
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '10px 16px',
-    }}>
-      <span style={{ fontSize: 13, color: '#333' }}>{label}</span>
+    <div className="flex items-center justify-between px-4 py-2.5">
+      <span className="text-[13px]" style={{ color: 'var(--color-ink)' }}>{label}</span>
       {children}
     </div>
   )
@@ -108,16 +101,15 @@ function HourSelect({ value, min = 0, max = 23, onChange }: {
     <select
       value={value}
       onChange={(e) => onChange(Number(e.target.value))}
+      className="text-[13px] rounded-md px-2 py-1 cursor-pointer outline-none"
       style={{
-        fontSize: 13, color: '#141414',
-        border: '1px solid #E8E6E0', borderRadius: 6,
-        padding: '4px 8px', background: '#FFFFFF', cursor: 'pointer',
+        border: '1px solid var(--color-hairline)',
+        background: 'var(--color-surface)',
+        color: 'var(--color-ink)',
       }}
     >
       {hours.map((h) => (
-        <option key={h} value={h}>
-          {String(h).padStart(2, '0')}:00
-        </option>
+        <option key={h} value={h}>{String(h).padStart(2, '0')}:00</option>
       ))}
     </select>
   )
@@ -136,10 +128,11 @@ function NumberInput({ value, min, max, onChange }: {
         const v = Number(e.target.value)
         if (v >= min && v <= max) onChange(v)
       }}
+      className="w-[60px] text-[13px] rounded-md px-2 py-1 text-center outline-none"
       style={{
-        width: 60, fontSize: 13, color: '#141414',
-        border: '1px solid #E8E6E0', borderRadius: 6,
-        padding: '4px 8px', background: '#FFFFFF', textAlign: 'center',
+        border: '1px solid var(--color-hairline)',
+        background: 'var(--color-surface)',
+        color: 'var(--color-ink)',
       }}
     />
   )

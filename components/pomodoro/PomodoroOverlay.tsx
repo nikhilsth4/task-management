@@ -32,7 +32,6 @@ export default function PomodoroOverlay() {
 
       if (rem <= 0 && !completedRef.current) {
         completedRef.current = true
-        // Credit the session only when a work session naturally completes
         if (!p.isBreak && p.activeTaskId) {
           const t = useTaskStore.getState().tasks.find((t) => t.id === p.activeTaskId)
           if (t) {
@@ -61,74 +60,63 @@ export default function PomodoroOverlay() {
     useUIStore.getState().stopPomodoro()
   }
 
+  const modeColor = isBreak ? '#22C55E' : '#F59E0B'
+
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 100,
-      background: 'rgba(14, 14, 14, 0.97)',
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      gap: 20,
-    }}>
+    <div
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-5"
+      style={{ background: 'rgba(14,14,14,0.97)' }}
+    >
       {/* Mode label */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Timer size={14} color={isBreak ? '#22C55E' : '#F59E0B'} />
-        <span style={{
-          fontSize: 12, fontWeight: 600, letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-          color: isBreak ? '#22C55E' : '#F59E0B',
-        }}>
+      <div className="flex items-center gap-2">
+        <Timer size={14} color={modeColor} />
+        <span
+          className="text-[12px] font-semibold tracking-[0.1em] uppercase"
+          style={{ color: modeColor }}
+        >
           {isBreak ? 'Break' : 'Focus'}
         </span>
       </div>
 
       {/* Task title */}
-      <p style={{
-        fontSize: 16, color: '#888888', margin: 0,
-        maxWidth: 400, textAlign: 'center',
-        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-      }}>
+      <p
+        className="text-[16px] m-0 max-w-[400px] text-center overflow-hidden text-ellipsis whitespace-nowrap"
+        style={{ color: '#888888' }}
+      >
         {isBreak
           ? `${task?.pomodoroSessions ?? ''} session${(task?.pomodoroSessions ?? 0) !== 1 ? 's' : ''} completed`
           : (task?.title ?? 'Focus session')}
       </p>
 
       {/* Timer */}
-      <p style={{
-        fontSize: 88, fontWeight: 200, color: '#FFFFFF',
-        margin: 0, letterSpacing: '0.04em',
-        fontVariantNumeric: 'tabular-nums',
-        fontFamily: 'var(--font-geist-mono)',
-      }}>
+      <p
+        className="text-[88px] font-extralight m-0 tracking-[0.04em]"
+        style={{
+          color: '#FFFFFF',
+          fontVariantNumeric: 'tabular-nums',
+          fontFamily: 'var(--font-mono)',
+        }}
+      >
         {display}
       </p>
 
       {/* End / Skip button */}
       <button
         onClick={handleEnd}
+        className="mt-4 bg-transparent rounded-lg px-7 py-2.5 text-[13px] cursor-pointer transition-[border-color,color] duration-150"
         style={{
-          marginTop: 16,
-          background: 'none',
           border: `1px solid ${confirmEnd ? '#DC2626' : '#333'}`,
           color: confirmEnd ? '#DC2626' : '#555',
-          borderRadius: 8,
-          padding: '10px 28px',
-          fontSize: 13,
-          cursor: 'pointer',
-          transition: 'border-color 0.15s, color 0.15s',
         }}
       >
-        {confirmEnd
-          ? 'Confirm end'
-          : isBreak ? 'Skip break' : 'End session'}
+        {confirmEnd ? 'Confirm end' : isBreak ? 'Skip break' : 'End session'}
       </button>
 
       {confirmEnd && (
         <button
           onClick={() => setConfirmEnd(false)}
-          style={{
-            background: 'none', border: 'none',
-            color: '#444', fontSize: 12, cursor: 'pointer',
-          }}
+          className="bg-transparent border-none text-[12px] cursor-pointer"
+          style={{ color: '#444' }}
         >
           Cancel
         </button>

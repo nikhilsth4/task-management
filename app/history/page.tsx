@@ -40,34 +40,32 @@ export default function HistoryPage() {
   }
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px', background: 'var(--color-canvas)' }}>
-      <h1 style={{ margin: '0 0 24px', fontSize: 20, fontWeight: 600, color: '#141414' }}>
+    <div className="flex-1 overflow-y-auto px-8 py-7" style={{ background: 'var(--color-canvas)' }}>
+      <h1 className="m-0 mb-6 text-[20px] font-semibold" style={{ color: 'var(--color-ink)' }}>
         Completed
       </h1>
 
       {grouped.length === 0 ? (
-        <p style={{ fontSize: 13, color: '#CCCCCC' }}>No completed tasks yet.</p>
+        <p className="text-[13px]" style={{ color: 'var(--color-muted)' }}>No completed tasks yet.</p>
       ) : (
         grouped.map(([date, dateTasks]) => (
-          <div key={date} style={{ marginBottom: 28 }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10,
-            }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#AAAAAA', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          <div key={date} className="mb-7">
+            <div className="flex items-center gap-2.5 mb-2.5">
+              <span className="text-[11px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--color-muted)' }}>
                 {formatDate(date)}
               </span>
-              <span style={{
-                fontSize: 11, color: '#AAAAAA', background: '#ECEAE4',
-                borderRadius: 10, padding: '1px 7px', fontWeight: 500,
-              }}>
+              <span
+                className="text-[11px] font-medium px-1.5 py-px rounded-[10px]"
+                style={{ color: 'var(--color-muted)', background: 'var(--color-stone)' }}
+              >
                 {dateTasks.length}
               </span>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div className="flex flex-col gap-1.5">
               {dateTasks.map((task) => {
                 const project = projects.find((p) => p.id === task.projectId)
-                const accent = project ? (COLOR_MAP[project.color] ?? '#E5E7EB') : '#E5E7EB'
+                const accent = project ? (COLOR_MAP[project.color] ?? 'var(--color-hairline)') : 'var(--color-hairline)'
                 return (
                   <div
                     key={task.id}
@@ -75,37 +73,33 @@ export default function HistoryPage() {
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter') setSelectedTaskId(task.id) }}
+                    className="flex items-stretch rounded-lg overflow-hidden cursor-pointer transition-shadow duration-150 hover:shadow-md"
                     style={{
-                      display: 'flex', alignItems: 'stretch',
-                      background: '#FFFFFF', border: '1px solid #E8E6E0',
-                      borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
+                      background: 'var(--color-surface)',
+                      border: '1px solid var(--color-hairline)',
                       boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                     }}
                   >
-                    <span style={{ width: 3, flexShrink: 0, background: accent }} />
-                    <div style={{ padding: '10px 14px', flex: 1, minWidth: 0 }}>
-                      <p style={{
-                        margin: 0, fontSize: 13, fontWeight: 500,
-                        color: '#AAAAAA', textDecoration: 'line-through',
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>
+                    <span className="w-[3px] shrink-0" style={{ background: accent }} />
+                    <div className="px-3.5 py-2.5 flex-1 min-w-0">
+                      <p
+                        className="m-0 text-[13px] font-medium overflow-hidden text-ellipsis whitespace-nowrap line-through"
+                        style={{ color: 'var(--color-slate)' }}
+                      >
                         {task.title}
                       </p>
-                      <div style={{ display: 'flex', gap: 8, marginTop: 3 }}>
+                      <div className="flex gap-2 mt-0.5">
                         {project && (
-                          <span style={{ fontSize: 11, color: '#CCCCCC' }}>{project.title}</span>
+                          <span className="text-[11px]" style={{ color: 'var(--color-muted)' }}>{project.title}</span>
                         )}
                         {task.pomodoroSessions > 0 && (
-                          <span style={{ fontSize: 11, color: '#CCCCCC' }}>
+                          <span className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
                             {task.pomodoroSessions} × 25 min focus
                           </span>
                         )}
                       </div>
                     </div>
-                    <div style={{
-                      alignSelf: 'center', paddingRight: 14,
-                      fontSize: 11, color: '#CCCCCC', flexShrink: 0,
-                    }}>
+                    <div className="self-center pr-3.5 text-[11px] shrink-0" style={{ color: 'var(--color-muted)' }}>
                       {new Date(task.completedAt!).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>

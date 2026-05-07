@@ -1,14 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import * as yup from 'yup'
 import { useTaskStore, type Recurrence, type Status, type Urgency, type Importance } from '@/store/tasks'
 import { useProjectStore } from '@/store/projects'
 import { useUIStore } from '@/store/ui'
 import { X, Trash2, Timer } from 'lucide-react'
-
-// ── Validation schemas ─────────────────────────────────────────────────────────
 
 const titleSchema = yup.string().required('Title is required').min(1).max(200, 'Max 200 characters')
 
@@ -25,8 +23,6 @@ const tagSchema = yup
   .min(1)
   .max(30, 'Max 30 characters')
   .matches(/^[^\s,]+$/, 'No spaces or commas')
-
-// ── Component ──────────────────────────────────────────────────────────────────
 
 const COLOR_MAP: Record<string, string> = {
   blue: '#3B82F6', rose: '#F43F5E', green: '#22C55E', amber: '#F59E0B',
@@ -57,7 +53,6 @@ export default function TaskDetail() {
   const [titleFocused, setTitleFocused] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  // Sync local draft state when the selected task changes
   useEffect(() => {
     if (task) {
       setTitle(task.title)
@@ -69,7 +64,6 @@ export default function TaskDetail() {
     }
   }, [task?.id])
 
-  // Close drawer if task was deleted externally
   useEffect(() => {
     if (selectedTaskId && !task) setSelectedTaskId(null)
   }, [task, selectedTaskId, setSelectedTaskId])
@@ -89,9 +83,7 @@ export default function TaskDetail() {
     }
   }
 
-  function saveNotes() {
-    updateTask(task!.id, { notes })
-  }
+  function saveNotes() { updateTask(task!.id, { notes }) }
 
   function saveDuration() {
     try {
@@ -107,11 +99,8 @@ export default function TaskDetail() {
   }
 
   function toggleStatus(next: Status) {
-    if (next === 'done') {
-      completeTask(task!.id)
-    } else {
-      updateTask(task!.id, { status: next, completedAt: null })
-    }
+    if (next === 'done') completeTask(task!.id)
+    else updateTask(task!.id, { status: next, completedAt: null })
   }
 
   function addTag(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -127,9 +116,7 @@ export default function TaskDetail() {
       setTagInput('')
       setErrors((e) => ({ ...e, tagInput: undefined }))
     } catch (err) {
-      if (err instanceof yup.ValidationError) {
-        setErrors((e) => ({ ...e, tagInput: err.message }))
-      }
+      if (err instanceof yup.ValidationError) setErrors((e) => ({ ...e, tagInput: err.message }))
     }
   }
 
@@ -154,7 +141,8 @@ export default function TaskDetail() {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.15 }}
         onClick={() => setSelectedTaskId(null)}
-        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.25)', zIndex: 40 }}
+        className="fixed inset-0 z-40"
+        style={{ background: 'rgba(0,0,0,0.25)' }}
       />
 
       {/* Drawer */}
@@ -163,34 +151,33 @@ export default function TaskDetail() {
         animate={{ x: 0 }}
         exit={{ x: 420 }}
         transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-        style={{
-          position: 'fixed', top: 0, right: 0, bottom: 0, width: 420,
-          background: '#FFFFFF', borderLeft: '1px solid #E8E6E0',
-          zIndex: 50, display: 'flex', flexDirection: 'column', overflowY: 'auto',
-        }}>
+        className="fixed top-0 right-0 bottom-0 w-[420px] z-50 flex flex-col overflow-y-auto"
+        style={{ background: 'var(--color-canvas)', borderLeft: '1px solid var(--color-hairline)' }}
+      >
         {/* Header */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '16px 20px', borderBottom: '1px solid #F0EEE9', flexShrink: 0,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div
+          className="flex items-center justify-between px-5 py-4 shrink-0"
+          style={{ borderBottom: '1px solid var(--color-hairline)' }}
+        >
+          <div className="flex items-center gap-2">
             {project && (
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: COLOR_MAP[project.color] ?? '#E5E7EB', flexShrink: 0 }} />
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: COLOR_MAP[project.color] ?? 'var(--color-hairline)' }} />
             )}
-            <span style={{ fontSize: 12, color: '#AAAAAA' }}>
+            <span className="text-[12px]" style={{ color: 'var(--color-slate)' }}>
               {project ? project.title : 'Inbox'}
             </span>
           </div>
           <button
             onClick={() => setSelectedTaskId(null)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#AAAAAA', padding: 4, display: 'flex' }}
+            className="flex items-center justify-center p-1 rounded cursor-pointer bg-transparent border-none"
+            style={{ color: 'var(--color-slate)' }}
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Body */}
-        <div style={{ flex: 1, padding: '20px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div className="flex-1 p-5 flex flex-col gap-5">
 
           {/* Title */}
           <div>
@@ -199,23 +186,21 @@ export default function TaskDetail() {
               onChange={(e) => { setTitle(e.target.value); setErrors((er) => ({ ...er, title: undefined })) }}
               onFocus={() => setTitleFocused(true)}
               onBlur={() => { setTitleFocused(false); saveTitle() }}
+              className="w-full text-[18px] font-semibold bg-transparent outline-none pb-0.5 font-[inherit] transition-[border-color] duration-150"
               style={{
-                fontSize: 18, fontWeight: 600, color: '#141414',
+                color: 'var(--color-ink)',
                 border: 'none',
                 borderBottom: errors.title
                   ? '1px solid #DC2626'
-                  : titleFocused ? '1px solid #141414' : '1px solid #E8E6E0',
-                outline: 'none', background: 'none',
-                width: '100%', fontFamily: 'inherit', padding: '0 0 2px',
-                transition: 'border-color 0.15s',
+                  : titleFocused ? '1px solid var(--color-ink)' : '1px solid var(--color-hairline)',
               }}
             />
-            {errors.title && <p style={errorStyle}>{errors.title}</p>}
+            {errors.title && <p className="mt-1 text-[11px] text-red-600">{errors.title}</p>}
           </div>
 
           {/* Status */}
           <Field label="Status">
-            <div style={{ display: 'flex', gap: 6 }}>
+            <div className="flex gap-1.5">
               {(['todo', 'in_progress', 'done'] as Status[]).map((s) => (
                 <ToggleBtn
                   key={s}
@@ -228,16 +213,16 @@ export default function TaskDetail() {
           </Field>
 
           {/* Urgency + Importance */}
-          <div style={{ display: 'flex', gap: 16 }}>
-            <Field label="Urgency" style={{ flex: 1 }}>
-              <div style={{ display: 'flex', gap: 6 }}>
+          <div className="flex gap-4">
+            <Field label="Urgency" className="flex-1">
+              <div className="flex gap-1.5">
                 {(['high', 'low'] as Urgency[]).map((v) => (
                   <ToggleBtn key={v} active={task.urgency === v} onClick={() => updateTask(task.id, { urgency: v })} label={v === 'high' ? 'High' : 'Low'} />
                 ))}
               </div>
             </Field>
-            <Field label="Importance" style={{ flex: 1 }}>
-              <div style={{ display: 'flex', gap: 6 }}>
+            <Field label="Importance" className="flex-1">
+              <div className="flex gap-1.5">
                 {(['high', 'low'] as Importance[]).map((v) => (
                   <ToggleBtn key={v} active={task.importance === v} onClick={() => updateTask(task.id, { importance: v })} label={v === 'high' ? 'High' : 'Low'} />
                 ))}
@@ -250,7 +235,12 @@ export default function TaskDetail() {
             <select
               value={task.projectId ?? ''}
               onChange={(e) => updateTask(task.id, { projectId: e.target.value || null })}
-              style={selectStyle}
+              className="w-full px-2.5 py-1.5 text-[13px] rounded-md cursor-pointer outline-none"
+              style={{
+                border: '1px solid var(--color-hairline)',
+                background: 'var(--color-surface)',
+                color: 'var(--color-ink)',
+              }}
             >
               <option value="">Inbox</option>
               {projects.map((p) => (
@@ -260,31 +250,40 @@ export default function TaskDetail() {
           </Field>
 
           {/* Schedule */}
-          <div style={{ display: 'flex', gap: 16 }}>
-            <Field label="Date" style={{ flex: 1 }}>
-              <input type="date" value={task.scheduledDate ?? ''} onChange={(e) => updateTask(task.id, { scheduledDate: e.target.value || null })} style={inputStyle} />
+          <div className="flex gap-4">
+            <Field label="Date" className="flex-1">
+              <FormInput type="date" value={task.scheduledDate ?? ''} onChange={(e) => updateTask(task.id, { scheduledDate: e.target.value || null })} />
             </Field>
-            <Field label="Time" style={{ flex: 1 }}>
-              <input type="time" value={task.scheduledTime ?? ''} onChange={(e) => updateTask(task.id, { scheduledTime: e.target.value || null })} style={inputStyle} />
+            <Field label="Time" className="flex-1">
+              <FormInput type="time" value={task.scheduledTime ?? ''} onChange={(e) => updateTask(task.id, { scheduledTime: e.target.value || null })} />
             </Field>
           </div>
 
           {/* Duration + Recurrence */}
-          <div style={{ display: 'flex', gap: 16 }}>
-            <Field label="Duration (min)" style={{ flex: 1 }}>
-              <input
+          <div className="flex gap-4">
+            <Field label="Duration (min)" className="flex-1">
+              <FormInput
                 type="number"
                 min={1}
                 value={durationStr}
                 onChange={(e) => { setDurationStr(e.target.value); setErrors((er) => ({ ...er, duration: undefined })) }}
                 onBlur={saveDuration}
-                style={{ ...inputStyle, borderColor: errors.duration ? '#DC2626' : '#E8E6E0' }}
                 placeholder="30"
+                error={!!errors.duration}
               />
-              {errors.duration && <p style={errorStyle}>{errors.duration}</p>}
+              {errors.duration && <p className="mt-1 text-[11px] text-red-600">{errors.duration}</p>}
             </Field>
-            <Field label="Recurrence" style={{ flex: 1 }}>
-              <select value={task.recurrence} onChange={(e) => updateTask(task.id, { recurrence: e.target.value as Recurrence })} style={selectStyle}>
+            <Field label="Recurrence" className="flex-1">
+              <select
+                value={task.recurrence}
+                onChange={(e) => updateTask(task.id, { recurrence: e.target.value as Recurrence })}
+                className="w-full px-2.5 py-1.5 text-[13px] rounded-md cursor-pointer outline-none"
+                style={{
+                  border: '1px solid var(--color-hairline)',
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-ink)',
+                }}
+              >
                 <option value="none">None</option>
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
@@ -297,29 +296,26 @@ export default function TaskDetail() {
           {/* Custom day picker */}
           {task.recurrence === 'custom' && (
             <Field label="Repeat on">
-              <div style={{ display: 'flex', gap: 6 }}>
-                {['S','M','T','W','T','F','S'].map((label, i) => {
+              <div className="flex gap-1.5">
+                {['S','M','T','W','T','F','S'].map((dayLabel, i) => {
                   const active = (task.customDays ?? []).includes(i)
                   return (
                     <button
                       key={i}
                       onClick={() => {
                         const days = task.customDays ?? []
-                        const next = active
-                          ? days.filter((d) => d !== i)
-                          : [...days, i].sort()
+                        const next = active ? days.filter((d) => d !== i) : [...days, i].sort()
                         updateTask(task.id, { customDays: next })
                       }}
+                      className="w-[30px] h-[30px] rounded-full text-[11px] font-semibold cursor-pointer transition-colors duration-100"
                       style={{
-                        width: 30, height: 30, borderRadius: '50%',
-                        fontSize: 11, fontWeight: 600, cursor: 'pointer',
                         border: '1px solid',
-                        borderColor: active ? '#2563EB' : '#E8E6E0',
-                        background: active ? '#2563EB' : 'transparent',
-                        color: active ? '#FFFFFF' : '#AAAAAA',
+                        borderColor: active ? 'var(--color-blue-action)' : 'var(--color-hairline)',
+                        background: active ? 'var(--color-blue-action)' : 'transparent',
+                        color: active ? '#FFFFFF' : 'var(--color-slate)',
                       }}
                     >
-                      {label}
+                      {dayLabel}
                     </button>
                   )
                 })}
@@ -329,25 +325,34 @@ export default function TaskDetail() {
 
           {/* Tags */}
           <Field label="Tags">
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: task.tags.length ? 8 : 0 }}>
-              {task.tags.map((tag) => (
-                <span key={tag} style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 4,
-                  background: '#F3F4F6', borderRadius: 4, padding: '3px 8px', fontSize: 12, color: '#555',
-                }}>
-                  {tag}
-                  <button onClick={() => removeTag(tag)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#AAAAAA', padding: 0, lineHeight: 1, fontSize: 14 }}>×</button>
-                </span>
-              ))}
-            </div>
-            <input
+            {task.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {task.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[12px]"
+                    style={{ background: 'var(--color-stone)', color: 'var(--color-ink)' }}
+                  >
+                    {tag}
+                    <button
+                      onClick={() => removeTag(tag)}
+                      className="bg-transparent border-none cursor-pointer leading-none text-[14px] p-0"
+                      style={{ color: 'var(--color-slate)' }}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <FormInput
               value={tagInput}
               onChange={(e) => { setTagInput(e.target.value); setErrors((er) => ({ ...er, tagInput: undefined })) }}
               onKeyDown={addTag}
               placeholder="Type and press Enter"
-              style={{ ...inputStyle, borderColor: errors.tagInput ? '#DC2626' : '#E8E6E0', width: '100%', boxSizing: 'border-box' }}
+              error={!!errors.tagInput}
             />
-            {errors.tagInput && <p style={errorStyle}>{errors.tagInput}</p>}
+            {errors.tagInput && <p className="mt-1 text-[11px] text-red-600">{errors.tagInput}</p>}
           </Field>
 
           {/* Notes */}
@@ -358,56 +363,55 @@ export default function TaskDetail() {
               onBlur={saveNotes}
               rows={4}
               placeholder="Add notes…"
-              style={{ ...inputStyle, width: '100%', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit' }}
+              className="w-full px-2.5 py-1.5 text-[13px] rounded-md outline-none resize-y font-[inherit]"
+              style={{
+                border: '1px solid var(--color-hairline)',
+                background: 'var(--color-surface)',
+                color: 'var(--color-ink)',
+              }}
             />
           </Field>
 
           {task.pomodoroSessions > 0 && (
-            <p style={{ fontSize: 12, color: '#AAAAAA', margin: 0 }}>
+            <p className="text-[12px] m-0" style={{ color: 'var(--color-slate)' }}>
               {task.pomodoroSessions} pomodoro session{task.pomodoroSessions !== 1 ? 's' : ''} completed
             </p>
           )}
         </div>
 
         {/* Footer */}
-        <div style={{
-          padding: '16px 20px', borderTop: '1px solid #F0EEE9',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0,
-        }}>
+        <div
+          className="flex justify-between items-center px-5 py-4 shrink-0"
+          style={{ borderTop: '1px solid var(--color-hairline)' }}
+        >
           <button
             onClick={handleDelete}
+            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[12px] cursor-pointer bg-transparent transition-colors duration-100"
             style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              background: 'none', border: '1px solid',
-              borderColor: confirmDelete ? '#DC2626' : '#E8E6E0',
-              color: confirmDelete ? '#DC2626' : '#AAAAAA',
-              borderRadius: 6, padding: '7px 12px', fontSize: 12, cursor: 'pointer',
+              border: '1px solid',
+              borderColor: confirmDelete ? '#DC2626' : 'var(--color-hairline)',
+              color: confirmDelete ? '#DC2626' : 'var(--color-slate)',
             }}
           >
             <Trash2 size={13} />
             {confirmDelete ? 'Confirm delete' : 'Delete'}
           </button>
 
-          {task!.status !== 'done' ? (
+          {task.status !== 'done' ? (
             <button
               onClick={() => { completeTask(task!.id); setSelectedTaskId(null) }}
-              style={{
-                background: '#16A34A', color: '#FFFFFF',
-                border: 'none', borderRadius: 6,
-                padding: '7px 14px', fontSize: 12, fontWeight: 500,
-                cursor: 'pointer',
-              }}
+              className="rounded-md px-3.5 py-1.5 text-[12px] font-medium cursor-pointer border-none text-white"
+              style={{ background: '#16A34A' }}
             >
               Mark Done
             </button>
           ) : (
             <button
               onClick={() => updateTask(task!.id, { status: 'todo', completedAt: null })}
+              className="rounded-md px-3.5 py-1.5 text-[12px] font-medium cursor-pointer bg-transparent"
               style={{
-                background: 'none', color: '#6B7280',
-                border: '1px solid #E8E6E0', borderRadius: 6,
-                padding: '7px 14px', fontSize: 12, fontWeight: 500,
-                cursor: 'pointer',
+                border: '1px solid var(--color-hairline)',
+                color: 'var(--color-slate)',
               }}
             >
               Reopen
@@ -416,13 +420,8 @@ export default function TaskDetail() {
 
           <button
             onClick={() => { startPomodoro(task!.id); setSelectedTaskId(null) }}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              background: '#141414', color: '#FFFFFF',
-              border: 'none', borderRadius: 6,
-              padding: '7px 14px', fontSize: 12, fontWeight: 500,
-              cursor: 'pointer',
-            }}
+            className="flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-[12px] font-medium cursor-pointer border-none text-white"
+            style={{ background: 'var(--color-ink)' }}
           >
             <Timer size={13} />
             Focus
@@ -433,12 +432,13 @@ export default function TaskDetail() {
   )
 }
 
-// ── Small helpers ──────────────────────────────────────────────────────────────
-
-function Field({ label, children, style }: { label: string; children: React.ReactNode; style?: React.CSSProperties }) {
+function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
   return (
-    <div style={style}>
-      <p style={{ fontSize: 11, fontWeight: 600, color: '#AAAAAA', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 6px' }}>
+    <div className={className}>
+      <p
+        className="text-[11px] font-semibold tracking-[0.06em] uppercase m-0 mb-1.5"
+        style={{ color: 'var(--color-slate)' }}
+      >
         {label}
       </p>
       {children}
@@ -450,13 +450,13 @@ function ToggleBtn({ active, onClick, label }: { active: boolean; onClick: () =>
   return (
     <button
       onClick={onClick}
+      className="px-3 py-1 text-[12px] rounded-md cursor-pointer transition-all duration-100"
       style={{
-        padding: '5px 12px', fontSize: 12, borderRadius: 5, cursor: 'pointer',
-        border: active ? '1px solid #141414' : '1px solid #E8E6E0',
-        background: active ? '#141414' : '#FFFFFF',
-        color: active ? '#FFFFFF' : '#666',
+        border: '1px solid',
+        borderColor: active ? 'var(--color-ink)' : 'var(--color-hairline)',
+        background: active ? 'var(--color-ink)' : 'transparent',
+        color: active ? 'var(--color-canvas)' : 'var(--color-slate)',
         fontWeight: active ? 600 : 400,
-        transition: 'all 0.1s',
       }}
     >
       {label}
@@ -464,26 +464,20 @@ function ToggleBtn({ active, onClick, label }: { active: boolean; onClick: () =>
   )
 }
 
-const errorStyle: React.CSSProperties = {
-  margin: '4px 0 0',
-  fontSize: 11,
-  color: '#DC2626',
-}
-
-const inputStyle: React.CSSProperties = {
-  padding: '7px 10px',
-  fontSize: 13,
-  border: '1px solid #E8E6E0',
-  borderRadius: 6,
-  outline: 'none',
-  background: '#FAFAF9',
-  color: '#141414',
-  width: '100%',
-  boxSizing: 'border-box',
-}
-
-const selectStyle: React.CSSProperties = {
-  ...inputStyle,
-  cursor: 'pointer',
-  appearance: 'auto',
+function FormInput({
+  error,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & { error?: boolean }) {
+  return (
+    <input
+      {...props}
+      className="w-full px-2.5 py-1.5 text-[13px] rounded-md outline-none"
+      style={{
+        border: '1px solid',
+        borderColor: error ? '#DC2626' : 'var(--color-hairline)',
+        background: 'var(--color-surface)',
+        color: 'var(--color-ink)',
+      }}
+    />
+  )
 }
