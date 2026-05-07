@@ -19,6 +19,7 @@ import MiniCard from '../matrix/MiniCard'
 
 export default function TimelineView() {
   const allTasks = useTaskStore((s) => s.tasks)
+  const addTask = useTaskStore((s) => s.addTask)
   const updateTask = useTaskStore((s) => s.updateTask)
   const settings = useUIStore((s) => s.settings)
   const setSelectedTaskId = useUIStore((s) => s.setSelectedTaskId)
@@ -72,6 +73,12 @@ export default function TimelineView() {
     if (task.scheduledDate === viewDate && task.scheduledTime === newTime) return
 
     updateTask(taskId, { scheduledDate: viewDate, scheduledTime: newTime })
+  }
+
+  function handleSlotClick(hour: number, minute: number) {
+    const time = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+    const task = addTask({ title: 'New task', scheduledDate: viewDate, scheduledTime: time })
+    setSelectedTaskId(task.id)
   }
 
   function prevDay() {
@@ -140,6 +147,7 @@ export default function TimelineView() {
             endHour={settings.timelineEndHour}
             activeId={activeId}
             onTaskClick={setSelectedTaskId}
+            onSlotClick={handleSlotClick}
           />
           <UnscheduledPanel
             tasks={unscheduled}
