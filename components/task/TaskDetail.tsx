@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import * as yup from 'yup'
 import { useTaskStore, type Recurrence, type Status, type Urgency, type Importance } from '@/store/tasks'
 import { useProjectStore } from '@/store/projects'
@@ -147,17 +148,26 @@ export default function TaskDetail() {
   return (
     <>
       {/* Backdrop */}
-      <div
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15 }}
         onClick={() => setSelectedTaskId(null)}
         style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.25)', zIndex: 40 }}
       />
 
       {/* Drawer */}
-      <aside style={{
-        position: 'fixed', top: 0, right: 0, bottom: 0, width: 420,
-        background: '#FFFFFF', borderLeft: '1px solid #E8E6E0',
-        zIndex: 50, display: 'flex', flexDirection: 'column', overflowY: 'auto',
-      }}>
+      <motion.aside
+        initial={{ x: 420 }}
+        animate={{ x: 0 }}
+        exit={{ x: 420 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+        style={{
+          position: 'fixed', top: 0, right: 0, bottom: 0, width: 420,
+          background: '#FFFFFF', borderLeft: '1px solid #E8E6E0',
+          zIndex: 50, display: 'flex', flexDirection: 'column', overflowY: 'auto',
+        }}>
         {/* Header */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -385,7 +395,7 @@ export default function TaskDetail() {
             Focus
           </button>
         </div>
-      </aside>
+      </motion.aside>
     </>
   )
 }

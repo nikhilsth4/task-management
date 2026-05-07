@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useUIStore } from '@/store/ui'
 import ViewSwitcher from '@/components/layout/ViewSwitcher'
 import QuickCapture from '@/components/task/QuickCapture'
@@ -13,6 +14,7 @@ import PomodoroOverlay from '@/components/pomodoro/PomodoroOverlay'
 
 export default function TodayPage() {
   const activeView = useUIStore((s) => s.activeView)
+  const selectedTaskId = useUIStore((s) => s.selectedTaskId)
   const captureRef = useRef<HTMLInputElement>(null)
 
   // Focus QuickCapture when / or N pressed outside an input
@@ -39,12 +41,23 @@ export default function TodayPage() {
         display: (activeView === 'timeline' || activeView === 'kanban') ? 'flex' : 'block',
         flexDirection: 'column',
       }}>
-        {activeView === 'list' && <ListView />}
-        {activeView === 'matrix' && <MatrixView />}
-        {activeView === 'timeline' && <TimelineView />}
-        {activeView === 'kanban' && <KanbanView />}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeView}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%' }}
+          >
+            {activeView === 'list' && <ListView />}
+            {activeView === 'matrix' && <MatrixView />}
+            {activeView === 'timeline' && <TimelineView />}
+            {activeView === 'kanban' && <KanbanView />}
+          </motion.div>
+        </AnimatePresence>
       </main>
-      <TaskDetail />
+      <AnimatePresence>{selectedTaskId && <TaskDetail />}</AnimatePresence>
       <PomodoroOverlay />
     </div>
   )
