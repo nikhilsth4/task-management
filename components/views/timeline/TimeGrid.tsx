@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { type Task } from '@/store/tasks'
 import TimeBlock from './TimeBlock'
@@ -10,6 +11,7 @@ interface Props {
   endHour: number
   activeId: string | null
   onTaskClick: (id: string) => void
+  onSlotClick: (hour: number, minute: number) => void
 }
 
 // Returns pixel height for a duration in minutes. 1 hour = 60px.
@@ -63,25 +65,48 @@ function buildOverlapGroups(tasks: Task[]): Map<string, { colIdx: number; totalC
   return layout
 }
 
-function DroppableSlot({ hour, minute }: { hour: number; minute: number }) {
+function DroppableSlot({ hour, minute, onSlotClick }: { hour: number; minute: number; onSlotClick: (h: number, m: number) => void }) {
   const id = `slot-${hour}-${minute}`
   const { isOver, setNodeRef } = useDroppable({ id })
   const isHalfHour = minute === 30
+  const [hovered, setHovered] = useState(false)
+  const label = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
 
   return (
     <div
       ref={setNodeRef}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        height: 30,
+        height: 30, position: 'relative',
         borderTop: isHalfHour ? '1px dashed #F0EEE8' : '1px solid #ECEAE4',
-        background: isOver ? '#EFF6FF' : 'transparent',
-        transition: 'background 0.12s',
+        background: isOver ? '#EFF6FF' : hovered ? '#FAFAF8' : 'transparent',
+        transition: 'background 0.1s',
       }}
-    />
+    >
+      {hovered && !isOver && (
+        <button
+          onClick={() => onSlotClick(hour, minute)}
+          style={{
+            position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+            display: 'flex', alignItems: 'center', gap: 4,
+            background: '#FFFFFF', border: '1px solid #E0DED8',
+            borderRadius: 5, padding: '2px 8px 2px 5px',
+            fontSize: 11, color: '#555', cursor: 'pointer',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+            zIndex: 10,
+          }}
+        >
+          <span style={{ fontSize: 14, lineHeight: 1, color: '#2563EB', fontWeight: 300 }}>+</span>
+          {label}
+        </button>
+      )}
+    </div>
   )
 }
 
-export default function TimeGrid({ scheduledTasks, startHour, endHour, activeId, onTaskClick }: Props) {
+export default function TimeGrid({ scheduledTasks, startHour, endHour, activeId, onTaskClick, onSlotClick }: Props) {
   const hours = Array.from({ length: endHour - startHour }, (_, i) => startHour + i)
   const layout = buildOverlapGroups(scheduledTasks)
 
@@ -103,8 +128,8 @@ export default function TimeGrid({ scheduledTasks, startHour, endHour, activeId,
 
             {/* Two 30-min droppable slots stacked */}
             <div style={{ flex: 1, position: 'relative' }}>
-              <DroppableSlot hour={hour} minute={0} />
-              <DroppableSlot hour={hour} minute={30} />
+              <DroppableSlot hour={hour} minute={0} onSlotClick={onSlotClick} />
+              <DroppableSlot hour={hour} minute={30} onSlotClick={onSlotClick} />
             </div>
           </div>
         ))}
