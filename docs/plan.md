@@ -41,11 +41,11 @@ Before writing any code, Claude outputs:
 `store/tasks.ts`, `store/projects.ts`, `store/ui.ts`, `lib/utils.ts`, `lib/constants.ts`
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [ ] Adding a task persists to localStorage and survives page refresh
-- [ ] Updating a task field updates all subscribers immediately
-- [ ] Deleting a task removes it from the store
-- [ ] Project store CRUD works independently of task store
-- [ ] UI store tracks active view and selected task without side effects
+- [x] Adding a task persists to localStorage and survives page refresh
+- [x] Updating a task field updates all subscribers immediately
+- [x] Deleting a task removes it from the store
+- [x] Project store CRUD works independently of task store
+- [ ] UI store tracks active view and selected task without side effects — partial, full verification in Parts 5/7/8
 
 > Note: localStorage persistence and subscriber tests are verified in Part 3 once the UI is wired up.
 
@@ -66,49 +66,49 @@ Before writing any code, Claude outputs:
 `app/(today)/page.tsx`, `components/layout/ViewSwitcher.tsx`, `components/layout/Sidebar.tsx`, `components/task/QuickCapture.tsx`, `components/task/TaskCard.tsx`, `components/views/ListView.tsx`
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [ ] Pressing `/` or `N` focuses QuickCapture from anywhere on the page
-- [ ] Submitting QuickCapture creates a task with `urgency: low`, `importance: low`, `status: todo`
-- [ ] New task appears immediately in ListView without page reload
-- [ ] ListView sorts by Q1 → Q2 → Q3 → Q4 priority correctly
-- [ ] Filter by project narrows the list correctly
+- [x] Pressing `/` or `N` focuses QuickCapture from anywhere on the page
+- [x] Submitting QuickCapture creates a task with `urgency: low`, `importance: low`, `status: todo`
+- [x] New task appears immediately in ListView without page reload
+- [x] ListView sorts by Q1 → Q2 → Q3 → Q4 priority correctly
+- [x] Filter by project narrows the list correctly
 
 ---
 
 ## Part 4: TaskDetail Drawer
 
 ### Substeps:
-- [ ] 4.1 Create `components/task/TaskDetail.tsx` — slide-in drawer triggered by clicking a TaskCard
-- [ ] 4.2 Fields: title, notes, urgency, importance, status, scheduledDate, scheduledTime, duration, recurrence, tags, projectId
-- [ ] 4.3 Wire drawer open/close to `ui.ts` selected task state
-- [ ] 4.4 Changes save on blur/change (no explicit save button needed)
-- [ ] 4.5 "Start Focus" button in drawer triggers Pomodoro (wired in Part 6)
+- [x] 4.1 Create `components/task/TaskDetail.tsx` — slide-in drawer triggered by clicking a TaskCard
+- [x] 4.2 Fields: title, notes, urgency, importance, status, scheduledDate, scheduledTime, duration, recurrence, tags, projectId
+- [x] 4.3 Wire drawer open/close to `ui.ts` selected task state
+- [x] 4.4 Changes save on blur/change (no explicit save button needed)
+- [x] 4.5 "Start Focus" button in drawer triggers Pomodoro (wired in Part 6)
 
 ### Files:
 `components/task/TaskDetail.tsx`
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [ ] Clicking a TaskCard opens the drawer with the correct task data
-- [ ] Editing the title updates the task in the store and reflects in ListView immediately
-- [ ] Closing and reopening the drawer shows persisted changes
-- [ ] Tag input adds and removes tags correctly
+- [x] Clicking a TaskCard opens the drawer with the correct task data
+- [x] Editing the title updates the task in the store and reflects in ListView immediately
+- [x] Closing and reopening the drawer shows persisted changes
+- [x] Tag input adds and removes tags correctly
 
 ---
 
 ## Part 5: MatrixView
 
 ### Substeps:
-- [ ] 5.1 Create `components/views/MatrixView.tsx` — 2×2 Eisenhower grid
-- [ ] 5.2 Render tasks in the correct quadrant based on `urgency` + `importance`
-- [ ] 5.3 Implement drag-and-drop between quadrants using dnd-kit
-- [ ] 5.4 On drop, update `urgency` and `importance` in the task store
+- [x] 5.1 Create `components/views/MatrixView.tsx` — 2×2 Eisenhower grid
+- [x] 5.2 Render tasks in the correct quadrant based on `urgency` + `importance`
+- [x] 5.3 Implement drag-and-drop between quadrants using dnd-kit
+- [x] 5.4 On drop, update `urgency` and `importance` in the task store
 
 ### Files:
 `components/views/MatrixView.tsx`
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [ ] All four quadrants render with correct task placement
-- [ ] Dragging a card to a new quadrant updates `urgency` and `importance` in the store
-- [ ] The change reflects in ListView and TaskDetail immediately
+- [x] All four quadrants render with correct task placement
+- [x] Dragging a card to a new quadrant updates `urgency` and `importance` in the store
+- [x] The change reflects in ListView and TaskDetail immediately
 
 ---
 

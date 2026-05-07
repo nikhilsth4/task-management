@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState } from 'react' // still used for filterTag
 import { useTaskStore } from '@/store/tasks'
 import { useProjectStore } from '@/store/projects'
 import { useUIStore } from '@/store/ui'
@@ -11,14 +11,19 @@ export default function ListView() {
   const tasks = useTaskStore((s) => s.tasks)
   const projects = useProjectStore((s) => s.projects)
   const setSelectedTaskId = useUIStore((s) => s.setSelectedTaskId)
+  const filterProjectId = useUIStore((s) => s.filterProjectId)
+  const setFilterProjectId = useUIStore((s) => s.setFilterProjectId)
 
-  const [filterProjectId, setFilterProjectId] = useState<string>('all')
   const [filterTag, setFilterTag] = useState<string>('all')
 
   const allTags = Array.from(new Set(tasks.flatMap((t) => t.tags))).sort()
 
   const filtered = tasks
-    .filter((t) => filterProjectId === 'all' || t.projectId === filterProjectId)
+    .filter((t) => {
+      if (filterProjectId === 'all') return true
+      if (filterProjectId === '') return t.projectId === null
+      return t.projectId === filterProjectId
+    })
     .filter((t) => filterTag === 'all' || t.tags.includes(filterTag))
     .sort((a, b) => getQuadrantPriority(a.urgency, a.importance) - getQuadrantPriority(b.urgency, b.importance))
 
