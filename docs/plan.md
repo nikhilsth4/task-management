@@ -115,25 +115,25 @@ Before writing any code, Claude outputs:
 ## Part 6: PomodoroOverlay
 
 ### Substeps:
-- [ ] 6.1 Create `components/pomodoro/PomodoroOverlay.tsx` — fullscreen overlay
-- [ ] 6.2 Timer: 25 min work / 5 min break (configurable via ui.ts settings)
-- [ ] 6.3 Display active task title during focus session
-- [ ] 6.4 On session complete: increment `task.pomodoroSessions`, prompt break
-- [ ] 6.5 While active: dim the rest of the UI (pointer-events-none overlay)
-- [ ] 6.6 Wire "Start Focus" in TaskDetail and TaskCard to activate overlay
-- [ ] 6.7 Allow early session end with confirmation prompt
+- [x] 6.1 Create `components/pomodoro/PomodoroOverlay.tsx` — fullscreen overlay
+- [x] 6.2 Timer: 25 min work / 5 min break (configurable via ui.ts settings)
+- [x] 6.3 Display active task title during focus session
+- [x] 6.4 On session complete: increment `task.pomodoroSessions`, prompt break
+- [x] 6.5 While active: dim the rest of the UI (pointer-events-none overlay)
+- [x] 6.6 Wire "Start Focus" in TaskDetail and TaskCard to activate overlay
+- [x] 6.7 Allow early session end with confirmation prompt
 
 ### Files:
 `components/pomodoro/PomodoroOverlay.tsx`, `store/ui.ts` (pomodoro state)
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [ ] Clicking "Start Focus" on a task opens the overlay and starts the timer
-- [ ] Timer counts down correctly; completes at 0:00
-- [ ] On completion, `task.pomodoroSessions` increments by 1 in the store
-- [ ] Break timer starts after work session completes
-- [ ] Ending a session early via confirmation does not increment the session count
-- [ ] The rest of the UI is non-interactive while overlay is active
-- [ ] Refreshing mid-session restores the overlay with the correct remaining time (pomodoro state persisted via Zustand `persist`)
+- [x] Clicking "Start Focus" on a task opens the overlay and starts the timer
+- [x] Timer counts down correctly; completes at 0:00
+- [x] On completion, `task.pomodoroSessions` increments by 1 in the store
+- [x] Break timer starts after work session completes
+- [x] Ending a session early via confirmation does not increment the session count
+- [x] The rest of the UI is non-interactive while overlay is active
+- [x] Refreshing mid-session restores the overlay with the correct remaining time (pomodoro state persisted via Zustand `persist`)
 
 ---
 

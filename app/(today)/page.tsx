@@ -7,6 +7,7 @@ import QuickCapture from '@/components/task/QuickCapture'
 import ListView from '@/components/views/ListView'
 import MatrixView from '@/components/views/matrix/MatrixView'
 import TaskDetail from '@/components/task/TaskDetail'
+import PomodoroOverlay from '@/components/pomodoro/PomodoroOverlay'
 
 export default function TodayPage() {
   const activeView = useUIStore((s) => s.activeView)
@@ -41,6 +42,7 @@ export default function TodayPage() {
         )}
       </main>
       <TaskDetail />
+      <PomodoroOverlay />
     </div>
   )
 }
