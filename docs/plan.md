@@ -217,7 +217,7 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 ### Substeps:
 - [x] 10.1 Create `app/settings/page.tsx` — preferences panel
 - [x] 10.2 Settings: timeline start/end hour, Pomodoro work/break duration
-- [ ] 10.3 Implement recurring task generation — auto-create next instance each morning
+- [ ] 10.3 Implement recurring task generation — moved to Part 11
 - [x] 10.4 Add Framer Motion transitions: drawer slide-in/out, view switching fade
 - [ ] 10.5 Final accessibility pass: keyboard navigation, focus traps in drawer/overlay
 - [x] 10.6 Verify no console errors, no TypeScript errors (`tsc --noEmit`)
@@ -230,3 +230,34 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 - [x] Changing timeline hours in settings reflects in TimelineView immediately
 - [x] Changing Pomodoro durations in settings takes effect on the next session
 - [x] `tsc --noEmit` passes with zero errors
+
+---
+
+## Part 11: Recurring Tasks & History
+
+### Recurring Task Design:
+Completing a recurring task immediately spawns the next instance scheduled for the next occurrence date. No on-load generation — completion is the trigger. Instances have `recurrence: none` so they don't chain further.
+
+### Substeps:
+- [x] 11.1 Add `customDays: number[]` to Task model (0=Sun … 6=Sat)
+- [x] 11.2 Add day-picker UI in TaskDetail — shown when `recurrence === 'custom'`
+- [x] 11.3 Create `lib/recurrence.ts` — `nextOccurrenceDate` + `buildInstance` logic
+- [x] 11.4 `completeTask` in store spawns next instance if task has recurrence set
+- [x] 11.5 Instances scheduled for next occurrence date with `recurrence: none`
+- [x] 11.6 Unfinished scheduled tasks roll over to today on app load (status reset to todo)
+- [x] 11.7 All views filter to today + unscheduled tasks only
+- [x] 11.8 Add `/history` page — completed tasks grouped by date, newest first
+- [x] 11.9 Add Completed nav link to Sidebar
+
+### Files:
+`store/tasks.ts`, `lib/recurrence.ts`, `components/task/TaskDetail.tsx`, `app/(today)/page.tsx`, `app/history/page.tsx`, `components/layout/Sidebar.tsx`
+
+### Tests & Success Criteria (Tier 1 + 2):
+- [x] Completing a daily task creates a new instance for tomorrow
+- [x] Completing a weekday task skips to next weekday
+- [x] Completing a weekly task schedules next instance 7 days later (same weekday)
+- [x] Completing a custom task schedules next instance on the next selected day
+- [x] New instance has recurrence: none — does not chain further
+- [x] Unfinished past tasks roll to today with status reset to todo
+- [x] Views show only today + unscheduled tasks
+- [x] Completed page groups tasks by date with completion time shown

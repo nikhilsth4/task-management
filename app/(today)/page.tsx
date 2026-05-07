@@ -3,6 +3,8 @@
 import { useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useUIStore } from '@/store/ui'
+import { useTaskStore } from '@/store/tasks'
+import { isoToday } from '@/lib/utils'
 import ViewSwitcher from '@/components/layout/ViewSwitcher'
 import QuickCapture from '@/components/task/QuickCapture'
 import ListView from '@/components/views/ListView'
@@ -15,7 +17,19 @@ import PomodoroOverlay from '@/components/pomodoro/PomodoroOverlay'
 export default function TodayPage() {
   const activeView = useUIStore((s) => s.activeView)
   const selectedTaskId = useUIStore((s) => s.selectedTaskId)
+  const tasks = useTaskStore((s) => s.tasks)
+  const updateTask = useTaskStore((s) => s.updateTask)
   const captureRef = useRef<HTMLInputElement>(null)
+
+  // Roll over unfinished scheduled tasks from past days to today
+  useEffect(() => {
+    const today = isoToday()
+    for (const task of tasks) {
+      if (task.scheduledDate && task.scheduledDate < today && task.status !== 'done') {
+        updateTask(task.id, { scheduledDate: today, status: 'todo', completedAt: null })
+      }
+    }
+  }, [])
 
   // Focus QuickCapture when / or N pressed outside an input
   useEffect(() => {

@@ -2,8 +2,9 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { generateId, isoNow } from '@/lib/utils'
+import { generateId, isoNow, isoToday } from '@/lib/utils'
 import { DEFAULT_TASK_DURATION } from '@/lib/constants'
+import { nextOccurrenceDate, buildInstance } from '@/lib/recurrence'
 
 export type Recurrence = 'none' | 'daily' | 'weekly' | 'weekdays' | 'custom'
 export type Status = 'todo' | 'in_progress' | 'done'
@@ -22,6 +23,7 @@ export interface Task {
   scheduledTime: string | null
   duration: number | null
   recurrence: Recurrence
+  customDays: number[]   // 0=Sun … 6=Sat, used when recurrence === 'custom'
   pomodoroSessions: number
   tags: string[]
   createdAt: string
@@ -36,6 +38,9 @@ interface TasksState {
   deleteTasksByProject: (projectId: string) => void
   completeTask: (id: string) => void
 }
+
+// Use in all views — hides recurring templates (they're config, not actionable tasks)
+export const selectActiveTasks = (tasks: Task[]) => tasks.filter((t) => t.recurrence === 'none')
 
 export const useTaskStore = create<TasksState>()(
   persist(
@@ -55,6 +60,7 @@ export const useTaskStore = create<TasksState>()(
           scheduledTime: partial.scheduledTime ?? null,
           duration: partial.duration ?? DEFAULT_TASK_DURATION,
           recurrence: partial.recurrence ?? 'none',
+          customDays: partial.customDays ?? [],
           pomodoroSessions: partial.pomodoroSessions ?? 0,
           tags: partial.tags ?? [],
           createdAt: isoNow(),
@@ -79,11 +85,22 @@ export const useTaskStore = create<TasksState>()(
       },
 
       completeTask: (id) => {
-        set((s) => ({
-          tasks: s.tasks.map((t) =>
-            t.id === id ? { ...t, status: 'done', completedAt: isoNow() } : t
-          ),
-        }))
+        set((s) => {
+          const task = s.tasks.find((t) => t.id === id)
+          if (!task) return {}
+
+          const completed = { ...task, status: 'done' as const, completedAt: isoNow() }
+          const updated = s.tasks.map((t) => (t.id === id ? completed : t))
+
+          if (task.recurrence === 'none') return { tasks: updated }
+
+          const fromDate = task.scheduledDate ?? isoToday()
+          const nextDate = nextOccurrenceDate(task.recurrence, task.customDays ?? [], fromDate)
+          if (!nextDate) return { tasks: updated }
+
+          const instance = buildInstance(task, nextDate, generateId, isoNow)
+          return { tasks: [...updated, instance] }
+        })
       },
     }),
     { name: 'tasks' }

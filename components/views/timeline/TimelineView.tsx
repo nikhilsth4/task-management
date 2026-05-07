@@ -10,7 +10,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { useTaskStore } from '@/store/tasks'
+import { useTaskStore, selectActiveTasks } from '@/store/tasks'
 import { useUIStore } from '@/store/ui'
 import { isoToday } from '@/lib/utils'
 import TimeGrid from './TimeGrid'
