@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutList, BarChart2, Settings, Plus, Check } from 'lucide-react'
+import { LayoutList, BarChart2, Settings, Plus, Check, X } from 'lucide-react'
 import { useProjectStore } from '@/store/projects'
+import { useTaskStore } from '@/store/tasks'
 import { useUIStore } from '@/store/ui'
 import { PROJECT_COLORS } from '@/lib/constants'
 
@@ -23,6 +24,8 @@ export default function Sidebar() {
   const pathname = usePathname()
   const projects = useProjectStore((s) => s.projects)
   const addProject = useProjectStore((s) => s.addProject)
+  const deleteProject = useProjectStore((s) => s.deleteProject)
+  const deleteTasksByProject = useTaskStore((s) => s.deleteTasksByProject)
   const filterProjectId = useUIStore((s) => s.filterProjectId)
   const setFilterProjectId = useUIStore((s) => s.setFilterProjectId)
 
@@ -177,16 +180,73 @@ export default function Sidebar() {
         />
 
         {projects.map((p) => (
-          <FilterItem
+          <ProjectItem
             key={p.id}
             label={p.title}
             active={filterProjectId === p.id}
-            onClick={() => setFilterProjectId(filterProjectId === p.id ? 'all' : p.id)}
             dot={COLOR_MAP[p.color] ?? '#888'}
+            onClick={() => setFilterProjectId(filterProjectId === p.id ? 'all' : p.id)}
+            onDelete={() => {
+              deleteTasksByProject(p.id)
+              deleteProject(p.id)
+              if (filterProjectId === p.id) setFilterProjectId('all')
+            }}
           />
         ))}
       </div>
     </aside>
+  )
+}
+
+function ProjectItem({
+  label, active, dot, onClick, onDelete,
+}: {
+  label: string
+  active: boolean
+  dot: string
+  onClick: () => void
+  onDelete: () => void
+}) {
+  const [hovered, setHovered] = useState(false)
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex', alignItems: 'center',
+        borderRadius: 6,
+        background: active ? '#2A2A2A' : 'transparent',
+      }}
+    >
+      <button
+        onClick={onClick}
+        style={{
+          flex: 1, display: 'flex', alignItems: 'center', gap: 8,
+          padding: '6px 10px', borderRadius: 6,
+          background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+          minWidth: 0,
+        }}
+      >
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: dot, flexShrink: 0 }} />
+        <span style={{ color: active ? '#FFFFFF' : '#888', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {label}
+        </span>
+      </button>
+      {hovered && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onDelete() }}
+          title="Delete project"
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: '4px 8px 4px 2px', color: active ? '#888' : '#666',
+            display: 'flex', alignItems: 'center', flexShrink: 0,
+          }}
+        >
+          <X size={12} />
+        </button>
+      )}
+    </div>
   )
 }
 
