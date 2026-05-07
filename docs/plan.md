@@ -217,7 +217,7 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 ### Substeps:
 - [x] 10.1 Create `app/settings/page.tsx` — preferences panel
 - [x] 10.2 Settings: timeline start/end hour, Pomodoro work/break duration
-- [ ] 10.3 Implement recurring task generation — auto-create next instance each morning
+- [ ] 10.3 Implement recurring task generation — moved to Part 11
 - [x] 10.4 Add Framer Motion transitions: drawer slide-in/out, view switching fade
 - [ ] 10.5 Final accessibility pass: keyboard navigation, focus traps in drawer/overlay
 - [x] 10.6 Verify no console errors, no TypeScript errors (`tsc --noEmit`)
@@ -230,3 +230,26 @@ Overlapping tasks (same time slot) are **stacked side by side** within the time 
 - [x] Changing timeline hours in settings reflects in TimelineView immediately
 - [x] Changing Pomodoro durations in settings takes effect on the next session
 - [x] `tsc --noEmit` passes with zero errors
+
+---
+
+## Part 11: Recurring Tasks
+
+### Substeps:
+- [ ] 11.1 Add `customDays: number[]` to Task model (0=Sun … 6=Sat)
+- [ ] 11.2 Add day-picker UI in TaskDetail — shown when `recurrence === 'custom'`
+- [ ] 11.3 Create `lib/recurrence.ts` — `isDueToday` + `buildInstance` logic
+- [ ] 11.4 Add `lastRecurrenceCheck` to UIStore (persisted)
+- [ ] 11.5 On app load, generate due recurring instances if not already checked today
+- [ ] 11.6 Completed instances are independent copies — template persists unchanged
+
+### Files:
+`store/tasks.ts`, `store/ui.ts`, `lib/recurrence.ts`, `components/task/TaskDetail.tsx`, `app/(today)/page.tsx`
+
+### Tests & Success Criteria (Tier 1 + 2):
+- [ ] Daily task generates a new instance every day on load
+- [ ] Weekday task skips Saturday and Sunday
+- [ ] Weekly task only generates on the correct day of week
+- [ ] Custom task only generates on the selected days
+- [ ] Completing a generated instance does not affect the template
+- [ ] Instances are not duplicated if the app is loaded multiple times in one day
