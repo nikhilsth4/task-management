@@ -143,25 +143,27 @@ Before writing any code, Claude outputs:
 Overlapping tasks (same time slot) are **stacked side by side** within the time column — no blocking, no silent overlap. This mirrors Google Calendar behavior: the conflict is visible but the user is never prevented from scheduling. Width of each block shrinks proportionally to fit all overlapping tasks in the column.
 
 ### Substeps:
-- [ ] 7.1 Create `components/views/TimelineView.tsx` — hour-by-hour grid (06:00–22:00 default)
-- [ ] 7.2 Render scheduled tasks as blocks sized by `duration`
-- [ ] 7.3 Create unscheduled tasks side panel
-- [ ] 7.4 Implement drag-and-drop from side panel to time slot using dnd-kit
-- [ ] 7.5 On drop, set `scheduledDate` and `scheduledTime` on the task
-- [ ] 7.6 Implement drag to reschedule already-placed blocks
-- [ ] 7.7 Detect overlapping tasks and render them side by side
+- [x] 7.1 Create `components/views/timeline/TimelineView.tsx` — hour-by-hour grid (06:00–22:00 default)
+- [x] 7.2 Render scheduled tasks as blocks sized by `duration`
+- [x] 7.3 Create unscheduled tasks side panel (`UnscheduledPanel.tsx`)
+- [x] 7.4 Implement drag-and-drop from side panel to time slot using dnd-kit
+- [x] 7.5 On drop, set `scheduledDate` and `scheduledTime` on the task
+- [x] 7.6 Implement drag to reschedule already-placed blocks
+- [x] 7.7 Detect overlapping tasks and render them side by side
+- [x] 7.8 Drag scheduled blocks back to unscheduled panel to clear schedule
+- [x] 7.9 Date navigation: prev/next arrows + click-to-open native calendar picker
 
 ### Files:
-`components/views/TimelineView.tsx`
+`components/views/timeline/TimelineView.tsx`, `components/views/timeline/TimeGrid.tsx`, `components/views/timeline/TimeBlock.tsx`, `components/views/timeline/UnscheduledPanel.tsx`
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [ ] Scheduled tasks appear in the correct time slot
-- [ ] Block height corresponds to `duration` in minutes
-- [ ] Dragging from unscheduled panel to a slot sets `scheduledDate` and `scheduledTime`
-- [ ] Only tasks without `scheduledDate` appear in the unscheduled panel
-- [ ] Dragging a placed block to a new slot updates the time correctly
-- [ ] Two tasks scheduled at the same time render side by side at half-width
-- [ ] Three overlapping tasks each render at one-third width
+- [x] Scheduled tasks appear in the correct time slot
+- [x] Block height corresponds to `duration` in minutes
+- [x] Dragging from unscheduled panel to a slot sets `scheduledDate` and `scheduledTime`
+- [x] Only tasks without `scheduledDate` appear in the unscheduled panel
+- [x] Dragging a placed block to a new slot updates the time correctly
+- [x] Two tasks scheduled at the same time render side by side at half-width
+- [x] Three overlapping tasks each render at one-third width
 
 ---
 
