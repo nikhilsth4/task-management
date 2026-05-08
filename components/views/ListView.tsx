@@ -56,19 +56,19 @@ export default function ListView() {
           <>
             {projects.length > 0 && (
               <select value={filterProjectId} onChange={(e) => setFilterProjectId(e.target.value)} style={selectStyle}>
-                <option value="all">All projects</option>
-                <option value="">Inbox</option>
-                {projects.map((p) => (
-                  <option key={p.id} value={p.id}>{p.title}</option>
-                ))}
+                {[
+                  <option key="__all" value="all">All projects</option>,
+                  <option key="__inbox" value="">Inbox</option>,
+                  ...projects.map((p) => <option key={p.id} value={p.id}>{p.title}</option>),
+                ]}
               </select>
             )}
             {allTags.length > 0 && (
               <select value={filterTag} onChange={(e) => setFilterTag(e.target.value)} style={selectStyle}>
-                <option value="all">All tags</option>
-                {allTags.map((tag) => (
-                  <option key={tag} value={tag}>{tag}</option>
-                ))}
+                {[
+                  <option key="__all" value="all">All tags</option>,
+                  ...allTags.map((tag) => <option key={`tag-${tag}`} value={tag}>{tag}</option>),
+                ]}
               </select>
             )}
           </>

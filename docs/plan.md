@@ -597,7 +597,7 @@ app/layout.tsx              (session check)
 ### Phase 0 Required: Yes
 
 ### Context
-Supabase Realtime pushes database changes to all connected clients. This means tasks updated on one device/tab appear instantly on another without polling. Combined with optimistic updates from Part 14, the UX feels instant on the local device while staying consistent across devices.
+Supabase Realtime pushes database changes to all connected clients. This means tasks updated on one device/tab appear instantly on another without polling. Combined with optimistic updates from Part 15, the UX feels instant on the local device while staying consistent across devices.
 
 ### Realtime Strategy
 - Subscribe to `tasks` and `projects` tables filtered by `user_id`

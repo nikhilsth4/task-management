@@ -4,20 +4,22 @@ import { dbToTask, dbToProject, type DbTask, type DbProject } from '@/lib/supaba
 import { useTaskStore } from '@/store/tasks'
 import { useProjectStore } from '@/store/projects'
 
-export function subscribeToTasks(onStatusChange: (connected: boolean) => void): RealtimeChannel {
+export function subscribeToTasks(
+  userId: string,
+  onStatusChange: (connected: boolean) => void,
+): RealtimeChannel {
   const supabase = createClient()
 
   return supabase
     .channel('tasks-changes')
     .on(
       'postgres_changes',
-      { event: '*', schema: 'public', table: 'tasks' },
+      { event: '*', schema: 'public', table: 'tasks', filter: `user_id=eq.${userId}` },
       (payload) => {
         const { eventType } = payload
         if (eventType === 'INSERT') {
           const row = payload.new as DbTask
           const { tasks } = useTaskStore.getState()
-          // Skip if already present — our own optimistic insert
           if (tasks.find((t) => t.id === row.id)) return
           useTaskStore.setState({ tasks: [...tasks, dbToTask(row)] })
         } else if (eventType === 'UPDATE') {
@@ -37,14 +39,17 @@ export function subscribeToTasks(onStatusChange: (connected: boolean) => void): 
     })
 }
 
-export function subscribeToProjects(onStatusChange: (connected: boolean) => void): RealtimeChannel {
+export function subscribeToProjects(
+  userId: string,
+  onStatusChange: (connected: boolean) => void,
+): RealtimeChannel {
   const supabase = createClient()
 
   return supabase
     .channel('projects-changes')
     .on(
       'postgres_changes',
-      { event: '*', schema: 'public', table: 'projects' },
+      { event: '*', schema: 'public', table: 'projects', filter: `user_id=eq.${userId}` },
       (payload) => {
         const { eventType } = payload
         if (eventType === 'INSERT') {
