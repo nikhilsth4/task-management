@@ -45,7 +45,9 @@ export default function TaskDetail() {
   const updateTask = useTaskStore((s) => s.updateTask)
   const deleteTask = useTaskStore((s) => s.deleteTask)
   const completeTask = useTaskStore((s) => s.completeTask)
+  const addTask = useTaskStore((s) => s.addTask)
   const projects = useProjectStore((s) => s.projects)
+  const aiEnabled = useUIStore((s) => s.aiEnabled)
 
   const [title, setTitle] = useState('')
   const [notes, setNotes] = useState('')
@@ -62,6 +64,10 @@ export default function TaskDetail() {
   const [errors, setErrors] = useState<FieldErrors>({})
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [breakdownSuggestions, setBreakdownSuggestions] = useState<string[]>([])
+  const [breakdownSelected, setBreakdownSelected] = useState<boolean[]>([])
+  const [breakdownLoading, setBreakdownLoading] = useState(false)
+  const [breakdownError, setBreakdownError] = useState<string | null>(null)
 
   useEffect(() => {
     if (task) {
@@ -170,6 +176,39 @@ export default function TaskDetail() {
     if (!confirmDelete) { setConfirmDelete(true); return }
     deleteTask(t.id)
     setSelectedTaskId(null)
+  }
+
+  async function handleBreakdown() {
+    setBreakdownLoading(true)
+    setBreakdownError(null)
+    try {
+      const proj = projects.find((p) => p.id === t.projectId)
+      const res = await fetch('/api/ai/breakdown', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, notes, projectTitle: proj?.title }),
+      })
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        setBreakdownError('AI failed — try again')
+        return
+      }
+      setBreakdownSuggestions(data.subtasks)
+      setBreakdownSelected(data.subtasks.map(() => true))
+    } catch {
+      setBreakdownError('AI failed — try again')
+    } finally {
+      setBreakdownLoading(false)
+    }
+  }
+
+  function applyBreakdown() {
+    breakdownSuggestions.forEach((s, i) => {
+      if (breakdownSelected[i]) addTask({ title: s, projectId: t.projectId, urgency: t.urgency, importance: t.importance })
+    })
+    setBreakdownSuggestions([])
+    setBreakdownSelected([])
+    setBreakdownError(null)
   }
 
   function toggleStatus(next: Status) {
@@ -330,6 +369,58 @@ export default function TaskDetail() {
               className="w-full px-2.5 py-1.5 text-[13px] rounded-md outline-none resize-y font-[inherit]"
               style={{ border: '1px solid var(--color-hairline)', background: 'var(--color-surface)', color: 'var(--color-ink)' }} />
           </Field>
+
+          {/* AI Breakdown */}
+          {aiEnabled && (
+            <div>
+              {breakdownSuggestions.length === 0 ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleBreakdown}
+                    disabled={breakdownLoading}
+                    className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[12px] cursor-pointer transition-all duration-150 disabled:opacity-50"
+                    style={{ border: '1px solid var(--color-hairline)', background: 'transparent', color: 'var(--color-slate)' }}
+                  >
+                    {breakdownLoading ? '…' : '✨'} {breakdownLoading ? 'Breaking down…' : 'Break down'}
+                  </button>
+                  {breakdownError && <span className="text-[12px] text-red-500">{breakdownError}</span>}
+                </div>
+              ) : (
+                <div className="rounded-md overflow-hidden" style={{ border: '1px solid var(--color-hairline)' }}>
+                  <div className="px-3 py-2 flex items-center justify-between" style={{ borderBottom: '1px solid var(--color-hairline)', background: 'var(--color-surface)' }}>
+                    <span className="text-[11px] font-semibold tracking-[0.06em] uppercase" style={{ color: 'var(--color-slate)' }}>✨ AI Suggestions</span>
+                    <button
+                      onClick={() => { setBreakdownSuggestions([]); setBreakdownSelected([]) }}
+                      className="text-[12px] bg-transparent border-none cursor-pointer"
+                      style={{ color: 'var(--color-slate)' }}
+                    >Dismiss</button>
+                  </div>
+                  <div className="flex flex-col">
+                    {breakdownSuggestions.map((s, i) => (
+                      <label key={i} className="flex items-center gap-2.5 px-3 py-2 cursor-pointer text-[13px]" style={{ borderBottom: i < breakdownSuggestions.length - 1 ? '1px solid var(--color-hairline)' : undefined, color: 'var(--color-ink)' }}>
+                        <input
+                          type="checkbox"
+                          checked={breakdownSelected[i] ?? false}
+                          onChange={(e) => setBreakdownSelected((prev) => prev.map((v, j) => j === i ? e.target.checked : v))}
+                          className="w-3.5 h-3.5 cursor-pointer accent-green-600"
+                        />
+                        {s}
+                      </label>
+                    ))}
+                  </div>
+                  <div className="px-3 py-2" style={{ borderTop: '1px solid var(--color-hairline)', background: 'var(--color-surface)' }}>
+                    <button
+                      onClick={applyBreakdown}
+                      disabled={!breakdownSelected.some(Boolean)}
+                      className="rounded-md px-3.5 py-1.5 text-[12px] font-medium cursor-pointer border-none disabled:opacity-40"
+                      style={{ background: 'var(--color-ink)', color: 'var(--color-canvas)' }}
+                    >Add selected</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Completed checkbox */}
           <label className="flex items-center gap-2.5 cursor-pointer select-none">
