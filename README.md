@@ -1,5 +1,7 @@
 # Focus
 
+**Live:** [task-management-tm.vercel.app](https://task-management-tm.vercel.app)
+
 A daily time management app built with Next.js and Supabase. Capture tasks, prioritize them across four views, schedule your day on a timeline, and stay in flow with a built-in Pomodoro timer — synced in real time across all your devices.
 
 ---
