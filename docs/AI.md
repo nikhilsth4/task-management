@@ -86,18 +86,18 @@ User: { "title": "Prepare quarterly report", "notes": "Due Friday, for the board
 **UX:** "Plan my day ✨" button in TimelineView header (only shown when there are unscheduled tasks for today). Opens a modal showing the proposed schedule as a list: "9:00 AM — Write report (90 min)". Each row has an accept/skip toggle. "Apply accepted" bulk-updates the tasks.
  
 #### Substeps
-- [ ] 19.14 Create `app/api/ai/plan-day/route.ts` — POST endpoint
+- [x] 19.14 Create `app/api/ai/plan-day/route.ts` — POST endpoint
   - Accepts `{ tasks: { id, title, duration, urgency, importance }[], scheduledTasks: { title, scheduledTime, duration }[], workStart: string, workEnd: string }`
   - Returns `{ schedule: { taskId, scheduledTime, duration }[] }`
   - AI fills gaps between already-scheduled tasks with unscheduled ones
   - System prompt instructs model to return **only valid JSON**
-- [ ] 19.15 Add "Plan my day ✨" button to `TimelineView.tsx` header
-- [ ] 19.16 On click: collect unscheduled tasks + today's scheduled tasks from store, POST to route
-- [ ] 19.17 Render suggestions modal with proposed time slots per task
-- [ ] 19.18 Each suggestion row has accept ✓ / skip ✗ toggle, defaulting to accepted
-- [ ] 19.19 "Apply" button calls `updateTask` for each accepted suggestion, setting `scheduledDate` + `scheduledTime` + `duration`
-- [ ] 19.20 AI respects `workStart`/`workEnd` from user settings in Supabase
-- [ ] 19.21 Q1 tasks (urgent + important) are scheduled first, Q4 tasks last
+- [x] 19.15 Add "Plan my day ✨" button to `TimelineView.tsx` header
+- [x] 19.16 On click: collect unscheduled tasks + today's scheduled tasks from store, POST to route
+- [x] 19.17 Render suggestions modal with proposed time slots per task
+- [x] 19.18 Each suggestion row has accept ✓ / skip ✗ toggle, defaulting to accepted
+- [x] 19.19 "Apply" button calls `updateTask` for each accepted suggestion, setting `scheduledDate` + `scheduledTime` + `duration`
+- [x] 19.20 AI respects `workStart`/`workEnd` from user settings
+- [x] 19.21 Q1 tasks (urgent + important) are scheduled first, Q4 tasks last
 #### Prompt Design
 ```
 System: You are a daily planner. Given a list of tasks and already-scheduled blocks, create a time-blocked schedule for the day. Prioritize urgent+important tasks first. Respect the work window. Leave 10-minute buffers between tasks. Return ONLY a JSON object with a "schedule" array where each item has: taskId (string), scheduledTime ("HH:MM"), duration (minutes as integer). Only include tasks that fit within the work window. No explanation, no markdown.
@@ -110,13 +110,13 @@ User: { "workStart": "09:00", "workEnd": "18:00", "scheduledTasks": [...], "task
 ### Shared Infrastructure
  
 #### Error Handling (all three routes)
-- [ ] 19.22 Wrap all AI calls in try/catch — return `{ error: string }` on failure
-- [ ] 19.23 Strip markdown fences before JSON parse: `.replace(/```json|```/g, '').trim()`
-- [ ] 19.24 Validate JSON shape before returning to client — if invalid, return error
-- [ ] 19.25 Client shows inline error toast on AI failure, never crashes the UI
+- [x] 19.22 Wrap all AI calls in try/catch — return `{ error: string }` on failure
+- [x] 19.23 Strip markdown fences before JSON parse: `.replace(/```json|```/g, '').trim()`
+- [x] 19.24 Validate JSON shape before returning to client — if invalid, return error
+- [x] 19.25 Client shows inline error toast on AI failure, never crashes the UI
 #### Loading States
-- [ ] 19.26 All three features show loading state on their trigger button (spinner, disabled)
-- [ ] 19.27 Loading state clears on both success and error
+- [x] 19.26 All three features show loading state on their trigger button (spinner, disabled)
+- [x] 19.27 Loading state clears on both success and error
 #### AI Settings in `app/settings/page.tsx`
 - [ ] 19.28 Add "AI Features" section to settings
 - [ ] 19.29 Toggle to enable/disable AI features globally (stored in `ui.ts`)
