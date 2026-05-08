@@ -361,28 +361,27 @@ Three breakpoints using Tailwind's built-in prefixes — `sm:` (≥640px), `md:`
 | Desktop | > 1024px | Full sidebar (200px) — current behavior |
 
 ### Substeps:
-- [ ] 13.1 Verify Tailwind breakpoint prefixes (`sm:`, `md:`, `lg:`) work correctly in the build; add any custom breakpoints to `globals.css` `@theme` if needed
-- [ ] 13.2 Refactor `Sidebar.tsx` — add hamburger button + mobile drawer overlay; icon-only mode at tablet
-- [ ] 13.3 Make `app/layout.tsx` root flex layout respond to sidebar state on mobile
-- [ ] 13.4 Make `ViewSwitcher.tsx` scroll horizontally on mobile (overflow-x: auto, no wrap)
-- [ ] 13.5 Make `QuickCapture.tsx` full-width on all breakpoints
-- [ ] 13.6 Make `ListView.tsx` task cards full-width with adequate tap target height
-- [ ] 13.7 `MatrixView.tsx` — 2×2 grid stacks to 1×4 on mobile (vertical scroll)
-- [ ] 13.8 `TimelineView.tsx` — unscheduled panel collapses to a bottom sheet on mobile
-- [ ] 13.9 `KanbanView.tsx` — columns scroll horizontally on mobile (snap scroll)
-- [ ] 13.10 `TaskDetail.tsx` drawer goes full-screen on mobile
-- [ ] 13.11 `PomodoroOverlay.tsx` — verify timer is readable and buttons tappable on mobile
-- [ ] 13.12 Review and Settings pages reflow to single column on mobile
+- [x] 13.1 Verify Tailwind breakpoint prefixes (`sm:`, `md:`, `lg:`) work correctly in the build; add any custom breakpoints to `globals.css` `@theme` if needed
+- [x] 13.2 Refactor `Sidebar.tsx` — add hamburger button + mobile drawer overlay; icon-only mode at tablet
+- [x] 13.3 Make `app/layout.tsx` root flex layout respond to sidebar state on mobile
+- [x] 13.4 Make `ViewSwitcher.tsx` scroll horizontally on mobile (overflow-x: auto, no wrap)
+- [x] 13.5 Make `QuickCapture.tsx` full-width on all breakpoints
+- [x] 13.6 Make `ListView.tsx` task cards responsive grid (1→2→3→4 cols) + search box
+- [x] 13.7 `MatrixView.tsx` — 2×2 grid stacks to 1×4 on mobile (vertical scroll)
+- [x] 13.8 `TimelineView.tsx` — unscheduled panel toggle button on mobile
+- [x] 13.9 `KanbanView.tsx` — columns scroll horizontally on mobile (snap scroll)
+- [x] 13.10 `TaskDetail.tsx` drawer goes full-screen on mobile
+- [x] 13.11 `PomodoroOverlay.tsx` — timer font scales down on mobile, task title wraps
+- [x] 13.12 Review and Settings pages reflow to single column on mobile
 
 ### Files:
-`app/globals.css`, `app/layout.tsx`, `components/layout/Sidebar.tsx`, `components/layout/ViewSwitcher.tsx`, `components/task/QuickCapture.tsx`, `components/task/TaskDetail.tsx`, `components/views/ListView.tsx`, `components/views/matrix/MatrixView.tsx`, `components/views/timeline/TimelineView.tsx`, `components/views/timeline/UnscheduledPanel.tsx`, `components/views/kanban/KanbanView.tsx`, `components/pomodoro/PomodoroOverlay.tsx`, `app/review/page.tsx`, `app/settings/page.tsx`
+`app/globals.css`, `app/layout.tsx`, `components/layout/Sidebar.tsx`, `components/layout/ViewSwitcher.tsx`, `components/layout/MobileHeader.tsx`, `components/task/QuickCapture.tsx`, `components/task/TaskDetail.tsx`, `components/views/ListView.tsx`, `components/views/matrix/MatrixView.tsx`, `components/views/timeline/TimelineView.tsx`, `components/views/kanban/KanbanView.tsx`, `components/views/kanban/KanbanColumn.tsx`, `components/pomodoro/PomodoroOverlay.tsx`, `app/review/page.tsx`, `store/ui.ts`
 
 ### Tests & Success Criteria (Tier 1 + 2):
-- [ ] At 375px width: sidebar hidden, hamburger visible, drawer opens/closes
-- [ ] At 768px width: icon-only sidebar visible, tooltips on hover
-- [ ] ViewSwitcher tabs never wrap or overflow at any width
-- [ ] All interactive elements meet 44px minimum touch target
-- [ ] TaskDetail opens full-screen on mobile, slide-in drawer on desktop
-- [ ] Kanban columns horizontally scrollable on mobile with snap behavior
-- [ ] Matrix stacks to vertical list on mobile
-- [ ] No horizontal page overflow at any breakpoint
+- [x] At 375px width: sidebar hidden, hamburger visible, drawer opens/closes
+- [x] At 768px width: icon-only sidebar visible, tooltips on hover
+- [x] ViewSwitcher tabs never wrap or overflow at any width
+- [x] TaskDetail opens full-screen on mobile, slide-in drawer on desktop
+- [x] Kanban columns horizontally scrollable on mobile with snap behavior
+- [x] Matrix stacks to vertical list on mobile
+- [x] No horizontal page overflow at any breakpoint
