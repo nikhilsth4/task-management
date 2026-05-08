@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutList, BarChart2, Settings, Plus, Check, X, CheckCheck, Sun, Moon, Monitor } from 'lucide-react'
+import { LayoutList, BarChart2, Settings, Plus, Check, X, CheckCheck, Sun, Moon, Monitor, LogOut } from 'lucide-react'
 import { useProjectStore } from '@/store/projects'
 import { useTaskStore } from '@/store/tasks'
 import { useUIStore, type Theme } from '@/store/ui'
 import { PROJECT_COLORS } from '@/lib/constants'
 import { applyTheme } from './ThemeSync'
+import { createClient } from '@/lib/supabase/client'
 
 const NAV = [
   { label: 'Today',     href: '/',        Icon: LayoutList },
@@ -201,6 +202,23 @@ export default function Sidebar() {
               />
             ))}
           </div>
+        </div>
+
+        {/* Sign out */}
+        <div className="px-3 pt-2 sm:flex sm:justify-center lg:block lg:px-3">
+          <button
+            onClick={async () => {
+              const supabase = createClient()
+              await supabase.auth.signOut()
+              window.location.href = '/login'
+            }}
+            title="Sign out"
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] border-none cursor-pointer transition-colors sm:w-auto sm:justify-center sm:px-2 lg:w-full lg:justify-start lg:px-2.5"
+            style={{ background: 'transparent', color: 'var(--color-sidebar-text)' }}
+          >
+            <LogOut size={14} strokeWidth={1.5} />
+            <span className="sm:hidden lg:inline">Sign out</span>
+          </button>
         </div>
 
         {/* Theme toggle — hidden on tablet icon strip */}

@@ -385,3 +385,246 @@ Three breakpoints using Tailwind's built-in prefixes — `sm:` (≥640px), `md:`
 - [x] Kanban columns horizontally scrollable on mobile with snap behavior
 - [x] Matrix stacks to vertical list on mobile
 - [x] No horizontal page overflow at any breakpoint
+
+
+---
+
+## Part 14: Supabase Setup + Database + Store Refactor
+
+### Phase 0 Required: Yes
+
+### Context
+localStorage is removed entirely. Supabase is the single source of truth from day one. Zustand stores become async in-memory caches — no `persist` middleware. Every user owns their own data enforced via Row Level Security.
+
+### Substeps
+
+#### Supabase Project
+- [ ] 14.1 Create Supabase project at supabase.com
+- [ ] 14.2 Add environment variables to `.env.local`:
+  ```
+  NEXT_PUBLIC_SUPABASE_URL=
+  NEXT_PUBLIC_SUPABASE_ANON_KEY=
+  SUPABASE_SERVICE_ROLE_KEY=
+  ```
+- [ ] 14.3 Add `.env.local` to `.gitignore`
+- [ ] 14.4 Install `@supabase/supabase-js` and `@supabase/ssr`
+
+#### Supabase Client
+- [ ] 14.5 Create `lib/supabase/client.ts` — browser client (uses anon key)
+- [ ] 14.6 Create `lib/supabase/server.ts` — server client (uses service role, for Route Handlers)
+- [ ] 14.7 Create `lib/supabase/middleware.ts` — session refresh helper
+
+#### Database Schema
+- [ ] 14.8 Create `supabase/migrations/001_initial_schema.sql`:
+
+```sql
+-- Projects
+create table projects (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  title text not null,
+  color text not null,
+  created_at timestamptz default now() not null
+);
+
+-- Tasks
+create table tasks (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  project_id uuid references projects(id) on delete set null,
+  parent_id uuid references tasks(id) on delete cascade,
+
+  title text not null,
+  notes text default '' not null,
+
+  urgency text check (urgency in ('high', 'low')) default 'low' not null,
+  importance text check (importance in ('high', 'low')) default 'low' not null,
+  status text check (status in ('todo', 'in_progress', 'done')) default 'todo' not null,
+
+  scheduled_date date,
+  scheduled_time time,
+  duration integer,
+
+  recurrence text check (recurrence in ('none', 'daily', 'weekly', 'weekdays', 'custom')) default 'none' not null,
+  custom_days integer[] default '{}',
+
+  pomodoro_sessions integer default 0 not null,
+  tags text[] default '{}',
+
+  created_at timestamptz default now() not null,
+  completed_at timestamptz
+);
+
+-- Indexes
+create index tasks_user_id_idx on tasks(user_id);
+create index tasks_parent_id_idx on tasks(parent_id);
+create index tasks_project_id_idx on tasks(project_id);
+create index tasks_scheduled_date_idx on tasks(scheduled_date);
+```
+
+- [ ] 14.9 Run migration in Supabase SQL editor
+- [ ] 14.10 Enable Row Level Security on both tables:
+
+```sql
+-- RLS on projects
+alter table projects enable row level security;
+
+create policy "Users can manage their own projects"
+  on projects for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+-- RLS on tasks
+alter table tasks enable row level security;
+
+create policy "Users can manage their own tasks"
+  on tasks for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+```
+
+#### Zustand Store Refactor
+- [ ] 14.11 Remove `persist` middleware from all three stores (`tasks.ts`, `projects.ts`, `ui.ts`)
+- [ ] 14.12 Remove `lib/storage.ts` entirely
+- [ ] 14.13 Refactor `store/tasks.ts` — all actions become async, call Supabase first, then update local state:
+  - `loadTasks(userId)` — fetch all tasks for the user on login
+  - `addTask(input)` — insert to Supabase, append to local state
+  - `updateTask(id, patch)` — optimistic update local state, then sync to Supabase; rollback on error
+  - `deleteTask(id)` — delete from Supabase (cascade handles subtasks), remove from local state
+  - `toggleStatus(id)` — update status + completedAt, trigger recurrence if applicable
+  - `addSubtask(parentId, title)` — insert with parentId + inherited projectId
+- [ ] 14.14 Refactor `store/projects.ts` — same async pattern:
+  - `loadProjects(userId)`
+  - `addProject(title, color)`
+  - `updateProject(id, patch)`
+  - `deleteProject(id)` — Supabase cascade sets tasks.project_id to null
+- [ ] 14.15 Add `loading: boolean` and `error: string | null` state to both stores
+- [ ] 14.16 Remove all `window`/localStorage references from the codebase (`grep -r localStorage` should return nothing)
+
+#### Type Sync
+- [ ] 14.17 Generate Supabase TypeScript types: `npx supabase gen types typescript --project-id <id> > lib/supabase/types.ts`
+- [ ] 14.18 Map Supabase snake_case types to existing camelCase TypeScript interfaces in `lib/supabase/mappers.ts`
+
+### Files Created / Modified
+```
+.env.local
+lib/supabase/client.ts
+lib/supabase/server.ts
+lib/supabase/middleware.ts
+lib/supabase/types.ts
+lib/supabase/mappers.ts
+supabase/migrations/001_initial_schema.sql
+store/tasks.ts              (refactored)
+store/projects.ts           (refactored)
+store/ui.ts                 (persist removed)
+lib/storage.ts              (deleted)
+```
+
+### Tests & Success Criteria (Tier 1 + 2)
+- [ ] `grep -r localStorage src/` returns zero results
+- [ ] Adding a task inserts a row in Supabase with correct `user_id`
+- [ ] Updating a task reflects in Supabase within 1 second
+- [ ] Deleting a project sets `project_id` to null on its tasks (not delete)
+- [ ] Deleting a task cascades and removes its subtasks from Supabase
+- [ ] `loading` state is true during async operations, false after
+- [ ] On Supabase write error, optimistic update is rolled back and `error` is set
+- [ ] `tsc --noEmit` passes with zero errors
+- [ ] RLS verified: manually querying Supabase with a different user's JWT returns zero rows
+
+---
+
+## Part 15: Auth — Email/Password + Protected Routes
+
+### Phase 0 Required: Yes
+
+### Substeps
+
+#### Auth UI
+- [ ] 15.1 Create `app/(auth)/login/page.tsx` — sign in form (email + password)
+- [ ] 15.2 Create `app/(auth)/signup/page.tsx` — sign up form (email + password + confirm password)
+- [ ] 15.3 Create `app/(auth)/verify/page.tsx` — "check your email" confirmation screen
+- [ ] 15.4 Create `app/(auth)/reset-password/page.tsx` — request password reset
+- [ ] 15.5 Style all auth pages using the existing design system (canvas bg, stone card, pill buttons)
+- [ ] 15.6 Add form validation — empty fields, password length ≥8, passwords match on signup
+
+#### Auth Logic
+- [ ] 15.7 Create `lib/auth.ts` — helpers: `signUp`, `signIn`, `signOut`, `resetPassword`
+- [ ] 15.8 On `signUp` — Supabase sends verification email; redirect to `/verify`
+- [ ] 15.9 On `signIn` — load tasks + projects into Zustand stores, redirect to `/`
+- [ ] 15.10 On `signOut` — clear Zustand stores, redirect to `/login`
+
+#### Session + Route Protection
+- [ ] 15.11 Create `middleware.ts` at project root — refresh session cookie on every request
+- [ ] 15.12 Protect all app routes — unauthenticated requests redirect to `/login`
+- [ ] 15.13 Public routes (no auth required): `/login`, `/signup`, `/verify`, `/reset-password`
+- [ ] 15.14 Add user session to `store/ui.ts`: `user: User | null`, `setUser`, `clearUser`
+
+#### App Integration
+- [ ] 15.15 In `app/layout.tsx` — check session server-side, pass user to client
+- [ ] 15.16 Add user avatar + sign out button to `Sidebar.tsx` footer (replaces theme toggle position — keep both)
+- [ ] 15.17 On first app load after sign in — call `loadTasks()` and `loadProjects()` with `user.id`
+
+### Files Created / Modified
+```
+app/(auth)/login/page.tsx
+app/(auth)/signup/page.tsx
+app/(auth)/verify/page.tsx
+app/(auth)/reset-password/page.tsx
+lib/auth.ts
+middleware.ts
+store/ui.ts                 (user session added)
+components/layout/Sidebar.tsx (sign out + avatar)
+app/layout.tsx              (session check)
+```
+
+### Tests & Success Criteria (Tier 1 + 2)
+- [ ] Signing up with valid credentials sends a verification email
+- [ ] Signing in with correct credentials loads the app and shows tasks
+- [ ] Signing in with wrong password shows an inline error (not a page crash)
+- [ ] Visiting `/` while unauthenticated redirects to `/login`
+- [ ] Visiting `/login` while authenticated redirects to `/`
+- [ ] Signing out clears Zustand stores and redirects to `/login`
+- [ ] Session persists across page reload (no re-login required)
+- [ ] Two different users see only their own tasks — verified manually
+- [ ] Password reset email is sent for a valid email address
+- [ ] `tsc --noEmit` passes with zero errors
+
+---
+
+## Part 16: Real-time Sync
+
+### Phase 0 Required: Yes
+
+### Context
+Supabase Realtime pushes database changes to all connected clients. This means tasks updated on one device/tab appear instantly on another without polling. Combined with optimistic updates from Part 14, the UX feels instant on the local device while staying consistent across devices.
+
+### Realtime Strategy
+- Subscribe to `tasks` and `projects` tables filtered by `user_id`
+- Events: `INSERT`, `UPDATE`, `DELETE`
+- On event: patch Zustand store directly — no full reload
+- Subscriptions created on sign-in, destroyed on sign-out
+
+### Substeps
+- [ ] 16.1 Create `lib/realtime.ts` — `subscribeToTasks(userId, store)` and `subscribeToProjects(userId, store)`
+- [ ] 16.2 On `INSERT` event → append to store if not already present (guard against own optimistic insert)
+- [ ] 16.3 On `UPDATE` event → patch matching task/project in store
+- [ ] 16.4 On `DELETE` event → remove matching item from store
+- [ ] 16.5 Wire subscriptions in `app/layout.tsx` — start on mount when user is present, cleanup on unmount
+- [ ] 16.6 On sign-out — call `supabase.removeAllChannels()` to clean up subscriptions
+- [ ] 16.7 Add connection status indicator to `Sidebar.tsx` footer — green dot (connected) / grey dot (reconnecting)
+
+### Files Created / Modified
+```
+lib/realtime.ts
+app/layout.tsx              (subscription wiring)
+components/layout/Sidebar.tsx (connection indicator)
+```
+
+### Tests & Success Criteria (Tier 1 + 2)
+- [ ] Adding a task in Tab A appears in Tab B within 1 second without reload
+- [ ] Updating a task title in Tab A reflects in Tab B immediately
+- [ ] Deleting a task in Tab A removes it from Tab B immediately
+- [ ] No duplicate tasks appear from own optimistic inserts
+- [ ] Subscriptions are cleaned up on sign-out (no memory leaks)
+- [ ] Connection indicator shows grey while Supabase reconnects, green when live
+- [ ] `tsc --noEmit` passes with zero errors
