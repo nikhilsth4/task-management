@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 const PUBLIC_PATHS = ['/login', '/signup', '/reset-password']
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p))
 
-  if (error) {
+  if (error && !isPublic) {
     await supabase.auth.signOut()
     return NextResponse.redirect(new URL('/login', request.url))
   }
