@@ -5,8 +5,10 @@ import { useUIStore } from '@/store/ui'
 export default function SettingsPage() {
   const settings = useUIStore((s) => s.settings)
   const pomodoro = useUIStore((s) => s.pomodoro)
+  const aiEnabled = useUIStore((s) => s.aiEnabled)
   const updateSettings = useUIStore((s) => s.updateSettings)
   const updatePomodoro = useUIStore((s) => s.updatePomodoroSettings)
+  const setAIEnabled = useUIStore((s) => s.setAIEnabled)
 
   return (
     <div className="flex-1 overflow-y-auto px-8 py-7" style={{ background: 'var(--color-canvas)' }}>
@@ -30,6 +32,27 @@ export default function SettingsPage() {
               min={settings.timelineStartHour + 1}
               onChange={(v) => updateSettings({ timelineEndHour: v })}
             />
+          </Row>
+        </Section>
+
+        <Section title="AI Features">
+          <Row label="Enable AI features">
+            <button
+              role="switch"
+              aria-checked={aiEnabled}
+              onClick={() => setAIEnabled(!aiEnabled)}
+              className="relative w-10 h-6 rounded-full transition-colors duration-200 outline-none cursor-pointer border-none shrink-0"
+              style={{ background: aiEnabled ? 'var(--color-blue-action)' : 'var(--color-hairline)' }}
+            >
+              <span
+                className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform duration-200"
+                style={{
+                  background: 'white',
+                  transform: aiEnabled ? 'translateX(16px)' : 'translateX(0)',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                }}
+              />
+            </button>
           </Row>
         </Section>
 

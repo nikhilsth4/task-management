@@ -118,9 +118,9 @@ User: { "workStart": "09:00", "workEnd": "18:00", "scheduledTasks": [...], "task
 - [x] 19.26 All three features show loading state on their trigger button (spinner, disabled)
 - [x] 19.27 Loading state clears on both success and error
 #### AI Settings in `app/settings/page.tsx`
-- [ ] 19.28 Add "AI Features" section to settings
-- [ ] 19.29 Toggle to enable/disable AI features globally (stored in `ui.ts`)
-- [ ] 19.30 When disabled: ✨ buttons hidden across all views
+- [x] 19.28 Add "AI Features" section to settings
+- [x] 19.29 Toggle to enable/disable AI features globally (stored in `ui.ts`)
+- [x] 19.30 When disabled: ✨ buttons hidden across all views
 ### Files Created / Modified
 ```
 lib/openrouter.ts
