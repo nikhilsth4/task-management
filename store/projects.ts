@@ -29,7 +29,7 @@ export const useProjectStore = create<ProjectsState>()((set) => ({
     set({ loading: true })
     const supabase = createClient()
     const { data, error } = await supabase.from('projects').select('*').order('created_at')
-    if (error) { console.error('fetchProjects:', error); set({ loading: false }); return }
+    if (error) { console.error('fetchProjects:', error.message, error.code, error.details); set({ loading: false }); return }
     set({ projects: (data ?? []).map(dbToProject), loading: false })
   },
 

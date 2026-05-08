@@ -52,7 +52,7 @@ export const useTaskStore = create<TasksState>()((set, get) => ({
     set({ loading: true })
     const supabase = createClient()
     const { data, error } = await supabase.from('tasks').select('*').order('created_at')
-    if (error) { console.error('fetchTasks:', error); set({ loading: false }); return }
+    if (error) { console.error('fetchTasks:', error.message, error.code, error.details); set({ loading: false }); return }
     set({ tasks: (data ?? []).map(dbToTask), loading: false })
   },
 
@@ -78,7 +78,7 @@ export const useTaskStore = create<TasksState>()((set, get) => ({
     set((s) => ({ tasks: [...s.tasks, task] }))
     const supabase = createClient()
     supabase.from('tasks').insert({ id: task.id, ...taskToDb(task), created_at: task.createdAt })
-      .then(({ error }) => { if (error) console.error('addTask:', error) })
+      .then(({ error }) => { if (error) console.error('addTask:', error.message, error.code, error.details) })
     return task
   },
 
@@ -86,21 +86,21 @@ export const useTaskStore = create<TasksState>()((set, get) => ({
     set((s) => ({ tasks: s.tasks.map((t) => (t.id === id ? { ...t, ...patch } : t)) }))
     const supabase = createClient()
     supabase.from('tasks').update(taskToDb(patch)).eq('id', id)
-      .then(({ error }) => { if (error) console.error('updateTask:', error) })
+      .then(({ error }) => { if (error) console.error('updateTask:', error.message, error.code, error.details) })
   },
 
   deleteTask: (id) => {
     set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) }))
     const supabase = createClient()
     supabase.from('tasks').delete().eq('id', id)
-      .then(({ error }) => { if (error) console.error('deleteTask:', error) })
+      .then(({ error }) => { if (error) console.error('deleteTask:', error.message, error.code, error.details) })
   },
 
   deleteTasksByProject: (projectId) => {
     set((s) => ({ tasks: s.tasks.filter((t) => t.projectId !== projectId) }))
     const supabase = createClient()
     supabase.from('tasks').delete().eq('project_id', projectId)
-      .then(({ error }) => { if (error) console.error('deleteTasksByProject:', error) })
+      .then(({ error }) => { if (error) console.error('deleteTasksByProject:', error.message, error.code, error.details) })
   },
 
   completeTask: (id) => {
@@ -126,11 +126,11 @@ export const useTaskStore = create<TasksState>()((set, get) => ({
 
     const supabase = createClient()
     supabase.from('tasks').update({ status: 'done', completed_at: completedAt }).eq('id', id)
-      .then(({ error }) => { if (error) console.error('completeTask:', error) })
+      .then(({ error }) => { if (error) console.error('completeTask:', error.message, error.code, error.details) })
 
     if (nextInstance) {
       supabase.from('tasks').insert({ id: nextInstance.id, ...taskToDb(nextInstance), created_at: nextInstance.createdAt })
-        .then(({ error }) => { if (error) console.error('completeTask insert instance:', error) })
+        .then(({ error }) => { if (error) console.error('completeTask insert instance:', error.message, error.code, error.details) })
     }
   },
 }))

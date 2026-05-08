@@ -30,7 +30,7 @@ export async function proxy(request: NextRequest) {
   if (error && !isPublic) {
     await supabase.auth.signOut()
     return NextResponse.redirect(new URL('/login', request.url))
-  }
+}
 
   if (!user && !isPublic) {
     return NextResponse.redirect(new URL('/login', request.url))

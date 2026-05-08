@@ -38,6 +38,10 @@ create index tasks_user_id_idx        on tasks(user_id);
 create index tasks_project_id_idx     on tasks(project_id);
 create index tasks_scheduled_date_idx on tasks(scheduled_date);
 
+-- Grants
+grant all on table projects to authenticated;
+grant all on table tasks to authenticated;
+
 -- Row Level Security
 alter table projects enable row level security;
 create policy "own projects" on projects for all

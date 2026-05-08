@@ -2,17 +2,23 @@
 
 import { forwardRef, useState } from 'react'
 import { useTaskStore } from '@/store/tasks'
+import { useUIStore } from '@/store/ui'
 
 const QuickCapture = forwardRef<HTMLInputElement>(function QuickCapture(_, ref) {
   const [value, setValue] = useState('')
+  const [added, setAdded] = useState(false)
   const addTask = useTaskStore((s) => s.addTask)
+  const setSelectedTaskId = useUIStore((s) => s.setSelectedTaskId)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const title = value.trim()
     if (!title) return
-    addTask({ title })
+    const task = addTask({ title })
     setValue('')
+    setAdded(true)
+    setTimeout(() => setAdded(false), 1500)
+    setSelectedTaskId(task.id)
   }
 
   return (
@@ -31,15 +37,18 @@ const QuickCapture = forwardRef<HTMLInputElement>(function QuickCapture(_, ref) 
         className="flex-1 bg-transparent border-none outline-none text-[14px]"
         style={{ color: 'var(--color-ink)', fontFamily: 'inherit' }}
       />
-      {value.trim() && (
-        <button
-          type="submit"
-          className="border-none rounded-full px-4 py-1.5 text-[12px] font-medium cursor-pointer tracking-wide transition-opacity hover:opacity-80"
-          style={{ background: 'var(--color-ink)', color: 'var(--color-canvas)' }}
-        >
-          Add
-        </button>
-      )}
+      <button
+        type="submit"
+        disabled={!value.trim()}
+        className="border-none rounded-full px-4 py-1.5 text-[12px] font-medium cursor-pointer tracking-wide transition-all duration-200 disabled:opacity-30"
+        style={{
+          background: added ? '#16A34A' : 'var(--color-ink)',
+          color: 'var(--color-canvas)',
+          minWidth: 56,
+        }}
+      >
+        {added ? '✓ Added' : 'Add'}
+      </button>
     </form>
   )
 })

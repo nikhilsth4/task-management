@@ -153,8 +153,15 @@ export const useUIStore = create<UIState>()(
       setLastRecurrenceCheck: (date) => set({ lastRecurrenceCheck: date }),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
     }),
-    // Persists the entire UI store to localStorage so active view,
-    // pomodoro session, and settings survive page reload.
-    { name: 'ui' }
+    {
+      name: 'ui',
+      // Only persist preferences and timer state — not session-level UI state
+      partialize: (s) => ({
+        theme: s.theme,
+        settings: s.settings,
+        pomodoro: s.pomodoro,
+        lastRecurrenceCheck: s.lastRecurrenceCheck,
+      }),
+    }
   )
 )

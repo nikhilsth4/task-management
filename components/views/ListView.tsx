@@ -17,6 +17,7 @@ export default function ListView() {
   const [filterTag, setFilterTag] = useState<string>('all')
   const [search, setSearch] = useState('')
 
+  console.log('ListView tasks:', tasks.length, 'today:', isoToday(), 'scheduledDates:', tasks.map(t => t.scheduledDate), 'statuses:', tasks.map(t => t.status))
   const allTags = Array.from(new Set(tasks.flatMap((t) => t.tags))).sort()
 
   const today = isoToday()
@@ -35,6 +36,7 @@ export default function ListView() {
     })
     .sort((a, b) => getQuadrantPriority(a.urgency, a.importance) - getQuadrantPriority(b.urgency, b.importance))
 
+  console.log('filtered count:', filtered.length, 'filterProjectId:', filterProjectId)
   const showFilters = projects.length > 0 || allTags.length > 0
 
   const selectStyle: React.CSSProperties = {

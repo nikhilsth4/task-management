@@ -47,7 +47,7 @@ export function dbToTask(row: DbTask): Task {
     importance: row.importance,
     status: row.status,
     scheduledDate: row.scheduled_date,
-    scheduledTime: row.scheduled_time,
+    scheduledTime: row.scheduled_time ? row.scheduled_time.slice(0, 5) : null,
     duration: row.duration,
     recurrence: row.recurrence,
     customDays: row.custom_days,
