@@ -86,6 +86,7 @@ export default function TaskDetail() {
   }, [task, selectedTaskId, setSelectedTaskId])
 
   if (!selectedTaskId || !task) return null
+  const t = task
 
   function handleSave() {
     let validTitle = title.trim()
@@ -98,7 +99,7 @@ export default function TaskDetail() {
       }
     }
 
-    let validDuration: number | null = task.duration
+    let validDuration: number | null = t.duration
     try {
       validDuration = durationSchema.validateSync(durationStr) ?? null
       setErrors((e) => ({ ...e, duration: undefined }))
@@ -109,7 +110,7 @@ export default function TaskDetail() {
       }
     }
 
-    updateTask(task.id, {
+    updateTask(t.id, {
       title: validTitle,
       notes,
       duration: validDuration,
@@ -150,16 +151,16 @@ export default function TaskDetail() {
 
   function handleDelete() {
     if (!confirmDelete) { setConfirmDelete(true); return }
-    deleteTask(task.id)
+    deleteTask(t.id)
     setSelectedTaskId(null)
   }
 
   function toggleStatus(next: Status) {
-    if (next === 'done') { completeTask(task.id); setSelectedTaskId(null) }
-    else updateTask(task.id, { status: next, completedAt: null })
+    if (next === 'done') { completeTask(t.id); setSelectedTaskId(null) }
+    else updateTask(t.id, { status: next, completedAt: null })
   }
 
-  const project = projects.find((p) => p.id === task.projectId)
+  const project = projects.find((p) => p.id === t.projectId)
 
   return (
     <>
