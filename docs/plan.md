@@ -629,3 +629,30 @@ components/layout/Sidebar.tsx (connection indicator)
 - [x] Subscriptions are cleaned up on unmount (no memory leaks)
 - [x] Connection indicator shows grey while reconnecting, green when live
 - [x] `tsc --noEmit` passes with zero errors
+
+---
+
+## Notes: Supabase Realtime Setup
+
+Three things required to get `postgres_changes` working — all three must be done or events are silently dropped:
+
+1. **Add table to the publication** (`migrations/002`):
+   ```sql
+   alter publication supabase_realtime add table tasks;
+   alter publication supabase_realtime add table projects;
+   ```
+
+2. **Set `REPLICA IDENTITY FULL`** (`migrations/003`) — without this, UPDATE/DELETE events are dropped when filtering by a non-primary-key column (`user_id`):
+   ```sql
+   alter table tasks replica identity full;
+   alter table projects replica identity full;
+   ```
+
+3. **Filter by `user_id` in the subscription** — required for RLS-protected tables, otherwise events are dropped:
+   ```ts
+   { event: '*', schema: 'public', table: 'tasks', filter: `user_id=eq.${userId}` }
+   ```
+
+**Deduplication:** Optimistic inserts use `crypto.randomUUID()` as the ID, passed to the DB. When Realtime fires the INSERT event with the same UUID, we skip it if it already exists in local state.
+
+**Status indicator:** `channel.subscribe((status) => ...)` returns `'SUBSCRIBED'` when live. Stored in `ui.ts` as `realtimeConnected`, shown as a green/grey dot in the Sidebar.
