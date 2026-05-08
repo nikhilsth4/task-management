@@ -684,3 +684,47 @@ None — Vercel reads next.config.ts and builds automatically
 - [x] Tasks load, create, update, delete correctly in production
 - [x] Realtime sync works across two browser tabs on the deployed URL
 - [x] No environment variable leaks in client bundle
+
+## Part 19: AI Features (OpenRouter)
+Use docs/AI.md for Part 19
+
+---
+
+## Part 20: Data Fetching Optimisation
+
+### Problem
+The global `fetchTasks()` loads every task for the user on boot — no limit, no filter. Over time (months of history), this becomes slow and wasteful. Completed tasks from weeks ago are fetched on every session even though no active view needs them.
+
+### Plan
+
+#### 20.1 Exclude old completed tasks from the main fetch
+- Add a cutoff: only fetch tasks where `completed_at IS NULL OR completed_at > now() - interval '7 days'`
+- Completed tasks older than 7 days are archived — they are only visible in `/review` or `/history`
+- The 7-day window keeps recently-checked-off tasks visible in active views so they don't vanish immediately
+
+#### 20.2 Date-scoped fetch for Timeline
+- Add `fetchTasksForDate(date: string)` action to the task store
+- Fetches: `scheduled_date = date OR scheduled_date IS NULL`
+- `TimelineView` calls this on mount and re-calls it whenever `viewDate` changes
+- Other views continue using the existing `fetchTasks()` (active tasks only, post-20.1)
+- After mutations (drag-to-schedule, plan my day, slot click), re-fetch for the current date to stay in sync
+
+#### 20.3 `/history` and `/review` fetch completed tasks separately
+- These pages query `completed_at IS NOT NULL` independently — they do not rely on the global store
+- Keeps the active task pool small and these pages accurate regardless of the cutoff window
+
+### Files to modify
+```
+store/tasks.ts                              (fetchTasksForDate action + cutoff on fetchTasks)
+components/views/timeline/TimelineView.tsx  (call fetchTasksForDate, re-fetch after mutations)
+app/(app)/history/page.tsx                  (own query for completed tasks)
+app/(app)/review/page.tsx                   (own query for completed tasks)
+```
+
+### Tests & Success Criteria
+- [ ] `fetchTasks` returns zero tasks completed more than 7 days ago
+- [ ] Navigating dates in Timeline triggers a new DB fetch each time
+- [ ] Drag-to-schedule re-fetches and task appears in correct slot immediately
+- [ ] Plan my day applied suggestions appear on the timeline without a manual refresh
+- [ ] `/review` still shows tasks completed more than 7 days ago
+- [ ] No regression in Matrix, List, or Kanban views
