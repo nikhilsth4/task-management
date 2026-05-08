@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import * as yup from 'yup'
 import { useTaskStore, type Recurrence, type Status, type Urgency, type Importance } from '@/store/tasks'
 import { useProjectStore } from '@/store/projects'
-import { useUIStore } from '@/store/ui'
+import { useUIStore, type AIPrefill } from '@/store/ui'
 import { X, Trash2, Timer } from 'lucide-react'
 
 const titleSchema = yup.string().required('Title is required').min(1).max(200, 'Max 200 characters')
@@ -39,6 +39,8 @@ export default function TaskDetail() {
   const selectedTaskId = useUIStore((s) => s.selectedTaskId)
   const setSelectedTaskId = useUIStore((s) => s.setSelectedTaskId)
   const startPomodoro = useUIStore((s) => s.startPomodoro)
+  const aiPrefill = useUIStore((s) => s.aiPrefill)
+  const setAIPrefill = useUIStore((s) => s.setAIPrefill)
   const task = useTaskStore((s) => s.tasks.find((t) => t.id === selectedTaskId))
   const updateTask = useTaskStore((s) => s.updateTask)
   const deleteTask = useTaskStore((s) => s.deleteTask)
@@ -84,6 +86,21 @@ export default function TaskDetail() {
   useEffect(() => {
     if (selectedTaskId && !task) setSelectedTaskId(null)
   }, [task, selectedTaskId, setSelectedTaskId])
+
+  // Apply AI prefill once when the drawer opens after smart capture
+  useEffect(() => {
+    if (!aiPrefill || !task) return
+    const p: AIPrefill = aiPrefill
+    setTitle(p.title)
+    setNotes(p.notes)
+    setUrgency(p.urgency)
+    setImportance(p.importance)
+    setScheduledDate(p.scheduledDate ?? '')
+    setScheduledTime(p.scheduledTime ?? '')
+    setDurationStr(p.duration != null ? String(p.duration) : '')
+    setTags(p.tags)
+    setAIPrefill(null)
+  }, [aiPrefill])
 
   if (!selectedTaskId || !task) return null
   const t = task

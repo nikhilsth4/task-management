@@ -12,6 +12,17 @@ import {
 export type View = 'list' | 'matrix' | 'timeline' | 'kanban'
 export type Theme = 'light' | 'dark' | 'system'
 
+export interface AIPrefill {
+  title: string
+  notes: string
+  urgency: 'high' | 'low'
+  importance: 'high' | 'low'
+  scheduledDate: string | null
+  scheduledTime: string | null
+  duration: number | null
+  tags: string[]
+}
+
 interface PomodoroState {
   activeTaskId: string | null
   isRunning: boolean
@@ -43,6 +54,8 @@ interface UIState {
   theme: Theme
   sidebarOpen: boolean
   realtimeConnected: boolean
+  aiEnabled: boolean
+  aiPrefill: AIPrefill | null
 
   setActiveView: (view: View) => void
   setSelectedTaskId: (id: string | null) => void
@@ -50,6 +63,8 @@ interface UIState {
   updateTheme: (theme: Theme) => void
   setSidebarOpen: (open: boolean) => void
   setRealtimeConnected: (connected: boolean) => void
+  setAIEnabled: (enabled: boolean) => void
+  setAIPrefill: (prefill: AIPrefill | null) => void
 
   // Begins a 25-min work session for the given task.
   startPomodoro: (taskId: string) => void
@@ -73,6 +88,8 @@ export const useUIStore = create<UIState>()(
       theme: 'system' as Theme,
       sidebarOpen: false,
       realtimeConnected: false,
+      aiEnabled: true,
+      aiPrefill: null,
 
       pomodoro: {
         activeTaskId: null,
@@ -156,6 +173,8 @@ export const useUIStore = create<UIState>()(
       setLastRecurrenceCheck: (date) => set({ lastRecurrenceCheck: date }),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       setRealtimeConnected: (connected) => set({ realtimeConnected: connected }),
+      setAIEnabled: (enabled) => set({ aiEnabled: enabled }),
+      setAIPrefill: (prefill) => set({ aiPrefill: prefill }),
     }),
     {
       name: 'ui',
@@ -165,6 +184,7 @@ export const useUIStore = create<UIState>()(
         settings: s.settings,
         pomodoro: s.pomodoro,
         lastRecurrenceCheck: s.lastRecurrenceCheck,
+        aiEnabled: s.aiEnabled,
       }),
     }
   )
