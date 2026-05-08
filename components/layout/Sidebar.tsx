@@ -13,7 +13,7 @@ import { createClient } from '@/lib/supabase/client'
 
 const NAV = [
   { label: 'Today',     href: '/',        Icon: LayoutList },
-  { label: 'Completed', href: '/history',  Icon: CheckCheck },
+  { label: 'All Tasks', href: '/history',  Icon: CheckCheck },
   { label: 'Review',    href: '/review',   Icon: BarChart2 },
   { label: 'Settings',  href: '/settings', Icon: Settings },
 ]
