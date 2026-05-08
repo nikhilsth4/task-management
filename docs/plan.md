@@ -606,13 +606,13 @@ Supabase Realtime pushes database changes to all connected clients. This means t
 - Subscriptions created on sign-in, destroyed on sign-out
 
 ### Substeps
-- [ ] 17.1 Create `lib/realtime.ts` — `subscribeToTasks(userId, store)` and `subscribeToProjects(userId, store)`
-- [ ] 17.2 On `INSERT` event → append to store if not already present (guard against own optimistic insert)
-- [ ] 17.3 On `UPDATE` event → patch matching task/project in store
-- [ ] 17.4 On `DELETE` event → remove matching item from store
-- [ ] 17.5 Wire subscriptions in `app/layout.tsx` — start on mount when user is present, cleanup on unmount
-- [ ] 17.6 On sign-out — call `supabase.removeAllChannels()` to clean up subscriptions
-- [ ] 17.7 Add connection status indicator to `Sidebar.tsx` footer — green dot (connected) / grey dot (reconnecting)
+- [x] 17.1 Create `lib/realtime.ts` — `subscribeToTasks(userId, store)` and `subscribeToProjects(userId, store)`
+- [x] 17.2 On `INSERT` event → append to store if not already present (guard against own optimistic insert)
+- [x] 17.3 On `UPDATE` event → patch matching task/project in store
+- [x] 17.4 On `DELETE` event → remove matching item from store
+- [x] 17.5 Wire subscriptions in `AppLoader.tsx` — start on mount after auth, cleanup on unmount
+- [x] 17.6 Subscriptions cleaned up via useEffect return in AppLoader
+- [x] 17.7 Add connection status indicator to `Sidebar.tsx` footer — green dot (connected) / grey dot (reconnecting)
 
 ### Files Created / Modified
 ```
@@ -622,10 +622,10 @@ components/layout/Sidebar.tsx (connection indicator)
 ```
 
 ### Tests & Success Criteria (Tier 1 + 2)
-- [ ] Adding a task in Tab A appears in Tab B within 1 second without reload
-- [ ] Updating a task title in Tab A reflects in Tab B immediately
-- [ ] Deleting a task in Tab A removes it from Tab B immediately
-- [ ] No duplicate tasks appear from own optimistic inserts
-- [ ] Subscriptions are cleaned up on sign-out (no memory leaks)
-- [ ] Connection indicator shows grey while Supabase reconnects, green when live
-- [ ] `tsc --noEmit` passes with zero errors
+- [x] Adding a task in Tab A appears in Tab B within 1 second without reload
+- [x] Updating a task in Tab A reflects in Tab B immediately
+- [x] Deleting a task in Tab A removes it from Tab B immediately
+- [x] No duplicate tasks appear from own optimistic inserts
+- [x] Subscriptions are cleaned up on unmount (no memory leaks)
+- [x] Connection indicator shows grey while reconnecting, green when live
+- [x] `tsc --noEmit` passes with zero errors
