@@ -656,3 +656,31 @@ Three things required to get `postgres_changes` working — all three must be do
 **Deduplication:** Optimistic inserts use `crypto.randomUUID()` as the ID, passed to the DB. When Realtime fires the INSERT event with the same UUID, we skip it if it already exists in local state.
 
 **Status indicator:** `channel.subscribe((status) => ...)` returns `'SUBSCRIBED'` when live. Stored in `ui.ts` as `realtimeConnected`, shown as a green/grey dot in the Sidebar.
+
+---
+
+## Part 18: Deployment to Vercel
+
+### Substeps
+- [ ] 18.1 Push repo to GitHub
+- [ ] 18.2 Import project in Vercel dashboard — connect GitHub repo
+- [ ] 18.3 Set environment variables in Vercel:
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- [ ] 18.4 Set Supabase Auth → URL Configuration:
+  - Site URL: `https://<your-vercel-domain>.vercel.app`
+  - Redirect URLs: `https://<your-vercel-domain>.vercel.app/**`
+- [ ] 18.5 Deploy and verify — sign up, sign in, tasks CRUD, realtime sync all work in production
+- [ ] 18.6 Set up a custom domain (optional)
+
+### Files Created / Modified
+```
+None — Vercel reads next.config.ts and builds automatically
+```
+
+### Tests & Success Criteria (Tier 1)
+- [ ] Production build completes with zero errors
+- [ ] Sign up and sign in work on the deployed URL
+- [ ] Tasks load, create, update, delete correctly in production
+- [ ] Realtime sync works across two browser tabs on the deployed URL
+- [ ] No environment variable leaks in client bundle (`SUPABASE_SERVICE_ROLE_KEY` must NOT be set as `NEXT_PUBLIC_`)
