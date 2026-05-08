@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutList, BarChart2, Settings, Plus, Check, X, CheckCheck, Sun, Moon, Monitor } from 'lucide-react'
@@ -38,10 +38,17 @@ export default function Sidebar() {
   const setFilterProjectId = useUIStore((s) => s.setFilterProjectId)
   const theme = useUIStore((s) => s.theme)
   const updateTheme = useUIStore((s) => s.updateTheme)
+  const sidebarOpen = useUIStore((s) => s.sidebarOpen)
+  const setSidebarOpen = useUIStore((s) => s.setSidebarOpen)
 
   const [showForm, setShowForm] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [newColor, setNewColor] = useState('blue')
+
+  // Close sidebar overlay when navigating
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [pathname])
 
   function handleAddProject(e: React.FormEvent) {
     e.preventDefault()
@@ -54,144 +61,169 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-[200px] shrink-0 flex flex-col h-full" style={{ background: 'var(--color-sidebar)' }}>
+    <>
+      {/* Mobile overlay backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 sm:hidden"
+          style={{ background: 'rgba(0,0,0,0.45)' }}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-      {/* Wordmark */}
-      <div className="px-5 py-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <span className="text-[13px] font-semibold tracking-widest uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-display)' }}>
-          Focus
-        </span>
-      </div>
-
-      {/* Nav */}
-      <nav className="px-3 py-4 flex flex-col gap-0.5">
-        {NAV.map(({ label, href, Icon }) => {
-          const active = pathname === href
-          return (
-            <Link
-              key={href}
-              href={href}
-              className="flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] no-underline transition-colors"
-              style={{
-                background: active ? 'var(--color-sidebar-active)' : 'transparent',
-                color: active ? '#ffffff' : 'var(--color-sidebar-text)',
-                fontWeight: active ? 500 : 400,
-              }}
-            >
-              <Icon size={14} strokeWidth={active ? 2 : 1.5} />
-              {label}
-            </Link>
-          )
-        })}
-      </nav>
-
-      {/* Projects */}
-      <div className="px-3 mt-2 flex-1 flex flex-col min-h-0">
-        <div className="flex items-center justify-between px-2.5 mb-2">
-          <p className="text-[10px] font-semibold tracking-widest uppercase m-0" style={{ color: 'rgba(255,255,255,0.25)' }}>
-            Projects
-          </p>
-          <button
-            onClick={() => setShowForm((v) => !v)}
-            title="New project"
-            className="border-none cursor-pointer p-0.5 flex transition-colors"
-            style={{ background: 'transparent', color: 'rgba(255,255,255,0.3)' }}
-          >
-            <Plus size={13} />
-          </button>
+      <aside
+        className={[
+          // Layout: fixed overlay on mobile, static in flow on sm+
+          'fixed inset-y-0 left-0 z-50 flex flex-col h-full shrink-0',
+          'sm:static sm:inset-auto sm:z-auto sm:h-full',
+          // Width: full sidebar on mobile overlay & desktop, icon strip on tablet
+          'w-[220px] sm:w-12 lg:w-[200px]',
+          // Slide animation on mobile only
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+          'sm:translate-x-0 transition-transform duration-250',
+        ].join(' ')}
+        style={{ background: 'var(--color-sidebar)' }}
+      >
+        {/* Wordmark — hidden on tablet icon strip */}
+        <div className="px-5 py-6 sm:hidden lg:block" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <span className="text-[13px] font-semibold tracking-widest uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-display)' }}>
+            Focus
+          </span>
         </div>
 
-        {/* Inline new project form */}
-        {showForm && (
-          <form onSubmit={handleAddProject} className="px-1 mb-2">
-            <input
-              autoFocus
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Project name"
-              className="w-full rounded-md px-2 py-1.5 text-[12px] outline-none mb-1.5"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: '#ffffff',
-                fontFamily: 'inherit',
-              }}
-            />
-            <div className="flex gap-1 flex-wrap mb-2">
-              {PROJECT_COLORS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setNewColor(c)}
-                  title={c}
-                  className="w-4 h-4 rounded-full cursor-pointer p-0 shrink-0 border-2 transition-all"
-                  style={{
-                    background: COLOR_MAP[c] ?? '#888',
-                    borderColor: newColor === c ? '#ffffff' : 'transparent',
-                  }}
-                />
-              ))}
-            </div>
-            <div className="flex gap-1.5">
-              <button
-                type="submit"
-                className="flex-1 rounded-md py-1 text-[11px] cursor-pointer flex items-center justify-center gap-1 transition-colors"
-                style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff' }}
-              >
-                <Check size={11} /> Add
-              </button>
-              <button
-                type="button"
-                onClick={() => { setShowForm(false); setNewTitle(''); setNewColor('blue') }}
-                className="rounded-md px-2.5 py-1 text-[11px] cursor-pointer transition-colors"
-                style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        )}
+        {/* Tablet top padding */}
+        <div className="hidden sm:block lg:hidden py-4" />
 
-        <div className="flex-1 overflow-y-auto min-h-0">
-          <FilterItem label="All Projects" active={filterProjectId === 'all'} onClick={() => setFilterProjectId('all')} dot={null} />
-          <FilterItem label="Inbox" active={filterProjectId === ''} onClick={() => setFilterProjectId(filterProjectId === '' ? 'all' : '')} dot="#6B7280" />
-          {projects.map((p) => (
-            <ProjectItem
-              key={p.id}
-              label={p.title}
-              active={filterProjectId === p.id}
-              dot={COLOR_MAP[p.color] ?? '#888'}
-              onClick={() => setFilterProjectId(filterProjectId === p.id ? 'all' : p.id)}
-              onDelete={() => {
-                deleteTasksByProject(p.id)
-                deleteProject(p.id)
-                if (filterProjectId === p.id) setFilterProjectId('all')
-              }}
-            />
-          ))}
-        </div>
-      </div>
+        {/* Nav */}
+        <nav className="px-3 py-4 flex flex-col gap-0.5 sm:px-1 lg:px-3">
+          {NAV.map(({ label, href, Icon }) => {
+            const active = pathname === href
+            return (
+              <Link
+                key={href}
+                href={href}
+                title={label}
+                className="flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] no-underline transition-colors sm:justify-center sm:px-0 lg:justify-start lg:px-2.5"
+                style={{
+                  background: active ? 'var(--color-sidebar-active)' : 'transparent',
+                  color: active ? '#ffffff' : 'var(--color-sidebar-text)',
+                  fontWeight: active ? 500 : 400,
+                }}
+              >
+                <Icon size={14} strokeWidth={active ? 2 : 1.5} />
+                <span className="sm:hidden lg:inline">{label}</span>
+              </Link>
+            )
+          })}
+        </nav>
 
-      {/* Theme toggle */}
-      <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="flex items-center justify-between rounded-lg p-0.5" style={{ background: 'rgba(255,255,255,0.05)' }}>
-          {THEME_CYCLES.map(({ value, Icon, label }) => (
+        {/* Projects — hidden on tablet icon strip */}
+        <div className="flex sm:hidden lg:flex px-3 mt-2 flex-1 flex-col min-h-0">
+          <div className="flex items-center justify-between px-2.5 mb-2">
+            <p className="text-[10px] font-semibold tracking-widest uppercase m-0" style={{ color: 'rgba(255,255,255,0.25)' }}>
+              Projects
+            </p>
             <button
-              key={value}
-              onClick={() => { updateTheme(value); applyTheme(value) }}
-              title={label}
-              className="flex-1 flex items-center justify-center py-1.5 rounded-md cursor-pointer border-none transition-all"
-              style={{
-                background: theme === value ? 'rgba(255,255,255,0.15)' : 'transparent',
-                color: theme === value ? '#ffffff' : 'rgba(255,255,255,0.3)',
-              }}
+              onClick={() => setShowForm((v) => !v)}
+              title="New project"
+              className="border-none cursor-pointer p-0.5 flex transition-colors"
+              style={{ background: 'transparent', color: 'rgba(255,255,255,0.3)' }}
             >
-              <Icon size={13} />
+              <Plus size={13} />
             </button>
-          ))}
+          </div>
+
+          {showForm && (
+            <form onSubmit={handleAddProject} className="px-1 mb-2">
+              <input
+                autoFocus
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="Project name"
+                className="w-full rounded-md px-2 py-1.5 text-[12px] outline-none mb-1.5"
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#ffffff',
+                  fontFamily: 'inherit',
+                }}
+              />
+              <div className="flex gap-1 flex-wrap mb-2">
+                {PROJECT_COLORS.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setNewColor(c)}
+                    title={c}
+                    className="w-4 h-4 rounded-full cursor-pointer p-0 shrink-0 border-2 transition-all"
+                    style={{
+                      background: COLOR_MAP[c] ?? '#888',
+                      borderColor: newColor === c ? '#ffffff' : 'transparent',
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="flex gap-1.5">
+                <button
+                  type="submit"
+                  className="flex-1 rounded-md py-1 text-[11px] cursor-pointer flex items-center justify-center gap-1 transition-colors"
+                  style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.1)', color: '#ffffff' }}
+                >
+                  <Check size={11} /> Add
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setShowForm(false); setNewTitle(''); setNewColor('blue') }}
+                  className="rounded-md px-2.5 py-1 text-[11px] cursor-pointer transition-colors"
+                  style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <FilterItem label="All Projects" active={filterProjectId === 'all'} onClick={() => setFilterProjectId('all')} dot={null} />
+            <FilterItem label="Inbox" active={filterProjectId === ''} onClick={() => setFilterProjectId(filterProjectId === '' ? 'all' : '')} dot="#6B7280" />
+            {projects.map((p) => (
+              <ProjectItem
+                key={p.id}
+                label={p.title}
+                active={filterProjectId === p.id}
+                dot={COLOR_MAP[p.color] ?? '#888'}
+                onClick={() => setFilterProjectId(filterProjectId === p.id ? 'all' : p.id)}
+                onDelete={() => {
+                  deleteTasksByProject(p.id)
+                  deleteProject(p.id)
+                  if (filterProjectId === p.id) setFilterProjectId('all')
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    </aside>
+
+        {/* Theme toggle — hidden on tablet icon strip */}
+        <div className="px-3 py-4 sm:hidden lg:block" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="flex items-center justify-between rounded-lg p-0.5" style={{ background: 'rgba(255,255,255,0.05)' }}>
+            {THEME_CYCLES.map(({ value, Icon, label }) => (
+              <button
+                key={value}
+                onClick={() => { updateTheme(value); applyTheme(value) }}
+                title={label}
+                className="flex-1 flex items-center justify-center py-1.5 rounded-md cursor-pointer border-none transition-all"
+                style={{
+                  background: theme === value ? 'rgba(255,255,255,0.15)' : 'transparent',
+                  color: theme === value ? '#ffffff' : 'rgba(255,255,255,0.3)',
+                }}
+              >
+                <Icon size={13} />
+              </button>
+            ))}
+          </div>
+        </div>
+      </aside>
+    </>
   )
 }
 

@@ -18,7 +18,7 @@ const QuickCapture = forwardRef<HTMLInputElement>(function QuickCapture(_, ref) 
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-3 px-6 py-3.5 shrink-0"
+      className="flex items-center gap-3 pl-14 pr-6 sm:px-6 py-3.5 shrink-0"
       style={{ background: 'var(--color-canvas)', borderBottom: '1px solid var(--color-hairline)' }}
     >
       <span className="text-base select-none" style={{ color: 'var(--color-muted)' }}>+</span>

@@ -41,11 +41,13 @@ interface UIState {
   // ISO date of the last time recurring tasks were generated (checked on app load).
   lastRecurrenceCheck: string | null
   theme: Theme
+  sidebarOpen: boolean
 
   setActiveView: (view: View) => void
   setSelectedTaskId: (id: string | null) => void
   setFilterProjectId: (id: string) => void
   updateTheme: (theme: Theme) => void
+  setSidebarOpen: (open: boolean) => void
 
   // Begins a 25-min work session for the given task.
   startPomodoro: (taskId: string) => void
@@ -67,6 +69,7 @@ export const useUIStore = create<UIState>()(
       filterProjectId: 'all',
       lastRecurrenceCheck: null,
       theme: 'system' as Theme,
+      sidebarOpen: false,
 
       pomodoro: {
         activeTaskId: null,
@@ -148,6 +151,7 @@ export const useUIStore = create<UIState>()(
       },
 
       setLastRecurrenceCheck: (date) => set({ lastRecurrenceCheck: date }),
+      setSidebarOpen: (open) => set({ sidebarOpen: open }),
     }),
     // Persists the entire UI store to localStorage so active view,
     // pomodoro session, and settings survive page reload.

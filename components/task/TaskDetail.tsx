@@ -151,7 +151,7 @@ export default function TaskDetail() {
         animate={{ x: 0 }}
         exit={{ x: 420 }}
         transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-        className="fixed top-0 right-0 bottom-0 w-[420px] z-50 flex flex-col overflow-y-auto"
+        className="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] z-50 flex flex-col overflow-y-auto"
         style={{ background: 'var(--color-canvas)', borderLeft: '1px solid var(--color-hairline)' }}
       >
         {/* Header */}

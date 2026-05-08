@@ -22,7 +22,7 @@ export default function KanbanColumn({ config, tasks, activeId, onTaskClick }: P
 
   return (
     <div
-      className="flex flex-col min-w-0 flex-1 rounded-[10px] transition-colors duration-150"
+      className="flex flex-col min-w-[280px] sm:min-w-0 flex-1 snap-start rounded-[10px] transition-colors duration-150"
       style={{
         background: isOver ? 'var(--badge-q2-bg)' : 'var(--color-canvas)',
         border: '1px solid var(--color-hairline)',

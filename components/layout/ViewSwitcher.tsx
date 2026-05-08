@@ -15,7 +15,7 @@ export default function ViewSwitcher() {
 
   return (
     <div
-      className="flex shrink-0 px-6"
+      className="flex shrink-0 pl-14 pr-2 sm:px-6 overflow-x-auto"
       style={{ borderBottom: '1px solid var(--color-hairline)', background: 'var(--color-canvas)' }}
     >
       {TABS.map(({ label, view }) => {

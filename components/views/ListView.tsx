@@ -15,6 +15,7 @@ export default function ListView() {
   const setFilterProjectId = useUIStore((s) => s.setFilterProjectId)
 
   const [filterTag, setFilterTag] = useState<string>('all')
+  const [search, setSearch] = useState('')
 
   const allTags = Array.from(new Set(tasks.flatMap((t) => t.tags))).sort()
 
@@ -27,6 +28,11 @@ export default function ListView() {
       return t.projectId === filterProjectId
     })
     .filter((t) => filterTag === 'all' || t.tags.includes(filterTag))
+    .filter((t) => {
+      if (!search.trim()) return true
+      const q = search.toLowerCase()
+      return t.title.toLowerCase().includes(q) || t.notes.toLowerCase().includes(q) || t.tags.some((tag) => tag.toLowerCase().includes(q))
+    })
     .sort((a, b) => getQuadrantPriority(a.urgency, a.importance) - getQuadrantPriority(b.urgency, b.importance))
 
   const showFilters = projects.length > 0 || allTags.length > 0
@@ -43,29 +49,43 @@ export default function ListView() {
   }
 
   return (
-    <div className="px-6 py-6 flex flex-col gap-4 max-w-2xl w-full">
-      {/* Filter bar */}
-      {showFilters && (
-        <div className="flex gap-2 flex-wrap">
-          {projects.length > 0 && (
-            <select value={filterProjectId} onChange={(e) => setFilterProjectId(e.target.value)} style={selectStyle}>
-              <option value="all">All projects</option>
-              <option value="">Inbox</option>
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>{p.title}</option>
-              ))}
-            </select>
-          )}
-          {allTags.length > 0 && (
-            <select value={filterTag} onChange={(e) => setFilterTag(e.target.value)} style={selectStyle}>
-              <option value="all">All tags</option>
-              {allTags.map((tag) => (
-                <option key={tag} value={tag}>{tag}</option>
-              ))}
-            </select>
-          )}
-        </div>
-      )}
+    <div className="px-4 sm:px-6 py-6 flex flex-col gap-4 w-full">
+      {/* Toolbar: filters left, search right */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {showFilters && (
+          <>
+            {projects.length > 0 && (
+              <select value={filterProjectId} onChange={(e) => setFilterProjectId(e.target.value)} style={selectStyle}>
+                <option value="all">All projects</option>
+                <option value="">Inbox</option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>{p.title}</option>
+                ))}
+              </select>
+            )}
+            {allTags.length > 0 && (
+              <select value={filterTag} onChange={(e) => setFilterTag(e.target.value)} style={selectStyle}>
+                <option value="all">All tags</option>
+                {allTags.map((tag) => (
+                  <option key={tag} value={tag}>{tag}</option>
+                ))}
+              </select>
+            )}
+          </>
+        )}
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search tasks…"
+          className="ml-auto rounded-lg px-3 py-[5px] text-[12px] outline-none w-40 focus:w-56 transition-all duration-200"
+          style={{
+            background: 'var(--color-stone)',
+            border: '1px solid var(--color-hairline)',
+            color: 'var(--color-ink)',
+          }}
+        />
+      </div>
 
       {/* Task list */}
       {filtered.length === 0 ? (
@@ -75,9 +95,9 @@ export default function ListView() {
           </p>
         </div>
       ) : (
-        <ul className="list-none m-0 p-0 flex flex-col gap-2">
+        <ul className="list-none m-0 p-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
           {filtered.map((task) => (
-            <li key={task.id}>
+            <li key={task.id} className="flex">
               <TaskCard task={task} onClick={() => setSelectedTaskId(task.id)} />
             </li>
           ))}

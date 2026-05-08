@@ -101,13 +101,13 @@ export default function ReviewPage() {
   const focusTrend = stats.thisWeekFocusTime - stats.lastWeekFocusTime
 
   return (
-    <div className="flex-1 overflow-y-auto px-8 py-7" style={{ background: 'var(--color-canvas)' }}>
+    <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-7" style={{ background: 'var(--color-canvas)' }}>
       <h1 className="m-0 mb-6 text-[20px] font-semibold" style={{ color: 'var(--color-ink)' }}>
         Weekly Review
       </h1>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-4 gap-3.5 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-7">
         <StatCard label="Completed Today" value={stats.completedToday} unit="tasks" sparkline={stats.todaySparkline} trend={null} color="#2563EB" />
         <StatCard label="This Week" value={stats.completedThisWeek} unit="tasks" sparkline={stats.todaySparkline} trend={todayTrend} color="#16A34A" />
         <StatCard label="Focus Time" value={Math.round(stats.totalFocusTime / 60 * 10) / 10} unit="hrs total" sparkline={stats.weekData.map((d) => ({ v: d.count }))} trend={focusTrend} color="#D97706" trendUnit="min" />
@@ -115,7 +115,7 @@ export default function ReviewPage() {
       </div>
 
       {/* Charts row */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <ChartCard title="Completions — Last 7 Days">
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={stats.weekData} barSize={28}>

@@ -77,10 +77,9 @@ export default function MatrixView() {
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div
-        className="grid flex-1 h-full"
+        className="grid flex-1 h-full grid-cols-1 sm:grid-cols-2 overflow-y-auto sm:overflow-hidden"
         style={{
-          gridTemplateColumns: '1fr 1fr',
-          gridTemplateRows: '1fr 1fr',
+          gridTemplateRows: 'auto',
           gap: 1,
           background: 'var(--color-hairline)',
         }}

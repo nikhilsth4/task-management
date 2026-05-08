@@ -65,7 +65,7 @@ export default function KanbanView() {
 
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex gap-3 p-4 h-full box-border">
+      <div className="flex gap-3 p-4 h-full box-border overflow-x-auto snap-x snap-mandatory">
         {COLUMNS.map((col) => (
           <KanbanColumn
             key={col.id}
