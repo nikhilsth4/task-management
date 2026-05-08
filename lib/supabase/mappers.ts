@@ -1,4 +1,5 @@
-import type { Task, Project } from '@/store/tasks'
+import type { Task } from '@/store/tasks'
+import type { Project } from '@/store/projects'
 
 export interface DbProject {
   id: string

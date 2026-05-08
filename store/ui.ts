@@ -42,12 +42,14 @@ interface UIState {
   lastRecurrenceCheck: string | null
   theme: Theme
   sidebarOpen: boolean
+  realtimeConnected: boolean
 
   setActiveView: (view: View) => void
   setSelectedTaskId: (id: string | null) => void
   setFilterProjectId: (id: string) => void
   updateTheme: (theme: Theme) => void
   setSidebarOpen: (open: boolean) => void
+  setRealtimeConnected: (connected: boolean) => void
 
   // Begins a 25-min work session for the given task.
   startPomodoro: (taskId: string) => void
@@ -70,6 +72,7 @@ export const useUIStore = create<UIState>()(
       lastRecurrenceCheck: null,
       theme: 'system' as Theme,
       sidebarOpen: false,
+      realtimeConnected: false,
 
       pomodoro: {
         activeTaskId: null,
@@ -152,6 +155,7 @@ export const useUIStore = create<UIState>()(
 
       setLastRecurrenceCheck: (date) => set({ lastRecurrenceCheck: date }),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      setRealtimeConnected: (connected) => set({ realtimeConnected: connected }),
     }),
     {
       name: 'ui',

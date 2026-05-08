@@ -41,6 +41,7 @@ export default function Sidebar() {
   const updateTheme = useUIStore((s) => s.updateTheme)
   const sidebarOpen = useUIStore((s) => s.sidebarOpen)
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen)
+  const realtimeConnected = useUIStore((s) => s.realtimeConnected)
 
   const [showForm, setShowForm] = useState(false)
   const [newTitle, setNewTitle] = useState('')
@@ -204,7 +205,7 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Sign out */}
+        {/* Sign out + connection indicator */}
         <div className="px-3 pt-2 sm:flex sm:justify-center lg:block lg:px-3">
           <button
             onClick={async () => {
@@ -219,6 +220,18 @@ export default function Sidebar() {
             <LogOut size={14} strokeWidth={1.5} />
             <span className="sm:hidden lg:inline">Sign out</span>
           </button>
+          <div
+            className="sm:hidden lg:flex items-center gap-1.5 px-2.5 pb-2"
+            title={realtimeConnected ? 'Live sync active' : 'Connecting…'}
+          >
+            <span
+              className="w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-500"
+              style={{ background: realtimeConnected ? '#22C55E' : 'rgba(255,255,255,0.2)' }}
+            />
+            <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+              {realtimeConnected ? 'Live' : 'Connecting…'}
+            </span>
+          </div>
         </div>
 
         {/* Theme toggle — hidden on tablet icon strip */}
