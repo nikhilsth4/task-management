@@ -27,6 +27,7 @@ export default function TimelineView() {
 
   const [viewDate, setViewDate] = useState(isoToday())
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [showUnscheduled, setShowUnscheduled] = useState(false)
   const dateInputRef = useRef<HTMLInputElement>(null)
 
   const filtered = allTasks.filter((t) => {
@@ -143,6 +144,22 @@ export default function TimelineView() {
             className="w-7 h-7 flex items-center justify-center rounded-md text-base cursor-pointer bg-transparent transition-colors hover:bg-stone"
             style={{ border: '1px solid var(--color-hairline)', color: 'var(--color-slate)', lineHeight: 1 }}
           >›</button>
+
+          {/* Unscheduled toggle — mobile only */}
+          <button
+            onClick={() => setShowUnscheduled((v) => !v)}
+            className="ml-auto sm:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] cursor-pointer transition-colors"
+            style={{
+              background: showUnscheduled ? 'var(--badge-q2-bg)' : 'var(--color-stone)',
+              border: '1px solid var(--color-hairline)',
+              color: showUnscheduled ? 'var(--color-blue-action)' : 'var(--color-slate)',
+            }}
+          >
+            Inbox
+            {unscheduled.length > 0 && (
+              <span className="font-semibold">{unscheduled.length}</span>
+            )}
+          </button>
         </div>
 
         {/* Main area */}
@@ -155,11 +172,13 @@ export default function TimelineView() {
             onTaskClick={setSelectedTaskId}
             onSlotClick={handleSlotClick}
           />
-          <UnscheduledPanel
-            tasks={unscheduled}
-            activeId={activeId}
-            onTaskClick={setSelectedTaskId}
-          />
+          <div className={`${showUnscheduled ? 'flex' : 'hidden'} sm:flex flex-col`}>
+            <UnscheduledPanel
+              tasks={unscheduled}
+              activeId={activeId}
+              onTaskClick={setSelectedTaskId}
+            />
+          </div>
         </div>
       </div>
 

@@ -80,7 +80,7 @@ export default function PomodoroOverlay() {
 
       {/* Task title */}
       <p
-        className="text-[16px] m-0 max-w-[400px] text-center overflow-hidden text-ellipsis whitespace-nowrap"
+        className="text-[16px] m-0 max-w-[80vw] sm:max-w-[400px] text-center px-4"
         style={{ color: '#888888' }}
       >
         {isBreak
@@ -90,7 +90,7 @@ export default function PomodoroOverlay() {
 
       {/* Timer */}
       <p
-        className="text-[88px] font-extralight m-0 tracking-[0.04em]"
+        className="text-[60px] sm:text-[88px] font-extralight m-0 tracking-[0.04em]"
         style={{
           color: '#FFFFFF',
           fontVariantNumeric: 'tabular-nums',
