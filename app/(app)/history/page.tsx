@@ -1,10 +1,12 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { useTaskStore } from '@/store/tasks'
 import { useProjectStore } from '@/store/projects'
 import { useUIStore } from '@/store/ui'
 import { isoToday } from '@/lib/utils'
+import TaskDetail from '@/components/task/TaskDetail'
 
 const COLOR_MAP: Record<string, string> = {
   blue: '#3B82F6', rose: '#F43F5E', green: '#22C55E', amber: '#F59E0B',
@@ -70,7 +72,10 @@ export default function HistoryPage() {
     return { sorted, unscheduled }
   }, [tasks, search])
 
+  const selectedTaskId = useUIStore((s) => s.selectedTaskId)
+
   return (
+    <>
     <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-7" style={{ background: 'var(--color-canvas)' }}>
       <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
         <h1 className="m-0 text-[20px] font-semibold" style={{ color: 'var(--color-ink)' }}>All Tasks</h1>
@@ -101,7 +106,7 @@ export default function HistoryPage() {
                   {dateTasks.length}
                 </span>
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
                 {dateTasks.map((task) => (
                   <TaskRow key={task.id} task={task} projects={projects} onClick={() => setSelectedTaskId(task.id)} />
                 ))}
@@ -117,7 +122,7 @@ export default function HistoryPage() {
                   {grouped.unscheduled.length}
                 </span>
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
                 {grouped.unscheduled.map((task) => (
                   <TaskRow key={task.id} task={task} projects={projects} onClick={() => setSelectedTaskId(task.id)} />
                 ))}
@@ -127,6 +132,8 @@ export default function HistoryPage() {
         </>
       )}
     </div>
+    <AnimatePresence>{selectedTaskId && <TaskDetail />}</AnimatePresence>
+    </>
   )
 }
 

@@ -591,7 +591,29 @@ app/layout.tsx              (session check)
 
 ---
 
-## Part 16: Real-time Sync
+## Part 16: All Tasks View
+
+### Substeps
+- [x] 16.1 Replace Completed page with All Tasks page (`app/(app)/history/page.tsx`)
+- [x] 16.2 Group tasks by scheduled date — past, today (highlighted blue), future
+- [x] 16.3 Unscheduled tasks shown in separate section at bottom
+- [x] 16.4 Search bar filters across title, notes, tags
+- [x] 16.5 Each row shows title, project, scheduled time, status badge
+- [x] 16.6 Completed tasks shown with strikethrough + reduced opacity
+- [x] 16.7 Rename sidebar nav item from "Completed" to "All Tasks"
+
+### Files
+`app/(app)/history/page.tsx`, `components/layout/Sidebar.tsx`
+
+### Tests & Success Criteria (Tier 1)
+- [x] All tasks appear grouped by date with correct labels (Today, Tomorrow, Yesterday, full date)
+- [x] Unscheduled tasks appear in their own section
+- [x] Search filters tasks in real time
+- [x] Clicking a task row opens TaskDetail drawer
+
+---
+
+## Part 17: Real-time Sync
 
 ### Phase 0 Required: Yes
 
