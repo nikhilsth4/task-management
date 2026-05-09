@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutList, BarChart2, Settings, Plus, Check, X, CheckCheck, Sun, Moon, Monitor, LogOut } from 'lucide-react'
+import { LayoutList, BarChart2, Settings, Plus, Check, X, CheckCheck, Sun, Moon, Monitor, LogOut, ArrowRight } from 'lucide-react'
 import { useProjectStore } from '@/store/projects'
 import { useTaskStore } from '@/store/tasks'
 import { useUIStore, type Theme } from '@/store/ui'
@@ -191,10 +191,9 @@ export default function Sidebar() {
             {projects.map((p) => (
               <ProjectItem
                 key={p.id}
+                id={p.id}
                 label={p.title}
-                active={filterProjectId === p.id}
                 dot={COLOR_MAP[p.color] ?? '#888'}
-                onClick={() => setFilterProjectId(filterProjectId === p.id ? 'all' : p.id)}
                 onDelete={() => {
                   deleteTasksByProject(p.id)
                   deleteProject(p.id)
@@ -258,10 +257,12 @@ export default function Sidebar() {
   )
 }
 
-function ProjectItem({ label, active, dot, onClick, onDelete }: {
-  label: string; active: boolean; dot: string; onClick: () => void; onDelete: () => void
+function ProjectItem({ id, label, dot, onDelete }: {
+  id: string; label: string; dot: string; onDelete: () => void
 }) {
   const [hovered, setHovered] = useState(false)
+  const pathname = usePathname()
+  const active = pathname === `/projects/${id}`
 
   return (
     <div
@@ -270,19 +271,25 @@ function ProjectItem({ label, active, dot, onClick, onDelete }: {
       className="flex items-center rounded-md"
       style={{ background: active ? 'var(--color-sidebar-active)' : 'transparent' }}
     >
-      <button
-        onClick={onClick}
-        className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-md border-none cursor-pointer text-left min-w-0"
+      <Link
+        href={`/projects/${id}`}
+        className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-md no-underline min-w-0"
         style={{ background: 'transparent' }}
       >
         <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: dot }} />
-        <span className="text-[13px] overflow-hidden text-ellipsis whitespace-nowrap" style={{ color: active ? '#ffffff' : 'var(--color-sidebar-text)' }}>
+        <span
+          className="flex-1 text-[13px] overflow-hidden text-ellipsis whitespace-nowrap"
+          style={{ color: active ? '#ffffff' : 'var(--color-sidebar-text)' }}
+        >
           {label}
         </span>
-      </button>
+        {hovered && (
+          <ArrowRight size={11} className="shrink-0" style={{ color: 'rgba(255,255,255,0.4)' }} />
+        )}
+      </Link>
       {hovered && (
         <button
-          onClick={(e) => { e.stopPropagation(); onDelete() }}
+          onClick={(e) => { e.stopPropagation(); e.preventDefault(); onDelete() }}
           title="Delete project"
           className="border-none cursor-pointer pr-2 pl-0.5 flex items-center shrink-0 transition-colors"
           style={{ background: 'transparent', color: 'rgba(255,255,255,0.3)' }}

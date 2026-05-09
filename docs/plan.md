@@ -686,11 +686,17 @@ None — Vercel reads next.config.ts and builds automatically
 - [x] No environment variable leaks in client bundle
 
 ## Part 19: AI Features (OpenRouter)
-Use docs/AI.md for Part 19
+Use docs/part-19-AI.md for Part 19
 
 ---
 
-## Part 20: Data Fetching Optimisation
+
+## Part 20: Project Page + AI Task Manager
+Use docs/ai-part-20-project.md for part 20
+
+
+---
+## Part 21: Data Fetching Optimisation
 
 ### Problem
 The global `fetchTasks()` loads every task for the user on boot — no limit, no filter. Over time (months of history), this becomes slow and wasteful. Completed tasks from weeks ago are fetched on every session even though no active view needs them.
@@ -728,3 +734,5 @@ app/(app)/review/page.tsx                   (own query for completed tasks)
 - [ ] Plan my day applied suggestions appear on the timeline without a manual refresh
 - [ ] `/review` still shows tasks completed more than 7 days ago
 - [ ] No regression in Matrix, List, or Kanban views
+
+
