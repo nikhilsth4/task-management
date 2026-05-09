@@ -3,6 +3,8 @@ import { z } from 'zod'
 import { openrouter, AI_MODEL } from '@/lib/openrouter'
 
 
+const RecurrenceSchema = z.enum(['none', 'daily', 'weekly', 'weekdays', 'custom'])
+
 const PatchSchema = z.object({
   title: z.string().optional(),
   notes: z.string().optional(),
@@ -13,6 +15,8 @@ const PatchSchema = z.object({
   scheduledTime: z.string().nullable().optional(),
   duration: z.number().nullable().optional(),
   tags: z.array(z.string()).optional(),
+  recurrence: RecurrenceSchema.optional(),
+  customDays: z.array(z.number().int().min(0).max(6)).optional(),
 })
 
 const ChatActionSchema = z.discriminatedUnion('type', [
@@ -26,6 +30,8 @@ const ChatActionSchema = z.discriminatedUnion('type', [
       scheduledTime: z.string().optional(),
       duration: z.number().optional(),
       tags: z.array(z.string()).optional(),
+      recurrence: RecurrenceSchema.optional(),
+      customDays: z.array(z.number().int().min(0).max(6)).optional(),
     }),
   }),
   z.object({
@@ -85,6 +91,18 @@ IMPORTANT RULES:
 - You may include multiple actions of the same type in one response.
 - Always parse dates and times from natural language. Compute relative dates from today (${today}): "yesterday" = today minus 1 day, "tomorrow" = today plus 1 day, weekday names = nearest future occurrence. Times: "10am" → "10:00", "3:30pm" → "15:30". Set scheduledDate (YYYY-MM-DD) and scheduledTime (HH:MM 24h) fields on the task payload.
 - NEVER put the date or time in the task title. Keep titles clean (e.g. "Reach out to Professor Smith", not "Reach out to Professor Smith at 10am tomorrow").
+- Detect recurrence from natural language and set the recurrence field:
+  • "every day" / "daily" → "daily"
+  • "every week" / "weekly" / "every Monday" / "every Friday" → "weekly"
+  • "every weekday" / "Mon-Fri" / "weekdays" → "weekdays"
+  • "every Monday and Wednesday" / "Tue, Thu, Sat" → "custom" + customDays array (0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday)
+  • No mention of repetition → omit recurrence (defaults to none)
+- When recurrence is set, ALWAYS also set scheduledDate (a recurring task without a start date never shows up):
+  • "daily" → use today (${today}) as scheduledDate
+  • "weekdays" → today if today is Mon–Fri, otherwise next Monday
+  • "weekly" with a specific weekday (e.g. "every Friday") → next occurrence of that weekday (today if today matches)
+  • "custom" with customDays → nearest future date matching any customDay (today if today matches)
+  Examples: "daily standup at 9am" → { recurrence: "daily", scheduledDate: "${today}", scheduledTime: "09:00" }. "review every Mon and Thu" → { recurrence: "custom", customDays: [1, 4], scheduledDate: "<next Mon or Thu>" }.
 
 Always respond with ONLY a valid JSON object:
 {
@@ -92,7 +110,9 @@ Always respond with ONLY a valid JSON object:
   "actions": [
     { "type": "complete_task", "payload": { "id": "task-id-here" } },
     { "type": "update_task", "payload": { "id": "task-id-here", "patch": { "urgency": "high", "importance": "high" } } },
-    { "type": "create_task", "payload": { "title": "New task", "urgency": "low", "importance": "high" } }
+    { "type": "create_task", "payload": { "title": "New task", "urgency": "low", "importance": "high" } },
+    { "type": "create_task", "payload": { "title": "Daily standup", "urgency": "low", "importance": "high", "scheduledTime": "09:00", "recurrence": "daily" } },
+    { "type": "create_task", "payload": { "title": "Team sync", "urgency": "low", "importance": "high", "scheduledTime": "14:00", "recurrence": "custom", "customDays": [1, 3, 5] } }
   ]
 }
 
