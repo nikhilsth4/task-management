@@ -2,15 +2,35 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { openrouter, AI_MODEL } from '@/lib/openrouter'
 
-const SYSTEM_PROMPT = `You are a task planner. Given a task title and optional notes, return ONLY a JSON object with a "subtasks" array of 3-7 short, concrete, actionable task titles. Each task should be completable in under 2 hours. No explanation, no markdown, just the JSON object.`
+const SubtaskSchema = z.object({
+  title: z.string().min(1),
+  urgency: z.enum(['high', 'low']),
+  importance: z.enum(['high', 'low']),
+  duration: z.number().int().positive(),
+})
 
 const BreakdownSchema = z.object({
-  subtasks: z.array(z.string().min(1)).min(1).max(7),
+  subtasks: z.array(SubtaskSchema).min(1).max(7),
 })
+
+const SYSTEM_PROMPT = `You are a task planner. Given a task, break it into 3–7 concrete, actionable subtasks.
+
+Return ONLY a JSON object:
+{
+  "subtasks": [
+    { "title": "short action title", "urgency": "high" | "low", "importance": "high" | "low", "duration": <minutes as integer> }
+  ]
+}
+
+Rules:
+- Distribute the parent's total duration across subtasks proportionally by complexity. If no duration given, estimate reasonably (each subtask under 120 min).
+- Assign urgency and importance per subtask based on how critical that step is.
+- Keep titles short and action-oriented.
+- No markdown, no explanation outside the JSON.`
 
 export async function POST(req: Request) {
   try {
-    const { title, notes, projectTitle } = await req.json()
+    const { title, notes, projectTitle, duration, scheduledDate } = await req.json()
     if (!title || typeof title !== 'string') {
       return NextResponse.json({ error: 'title is required' }, { status: 400 })
     }
@@ -21,7 +41,13 @@ export async function POST(req: Request) {
         { role: 'system', content: SYSTEM_PROMPT },
         {
           role: 'user',
-          content: JSON.stringify({ title, notes: notes || '', projectTitle: projectTitle || undefined }),
+          content: JSON.stringify({
+            title,
+            notes: notes || '',
+            projectTitle: projectTitle || undefined,
+            totalDuration: duration ?? null,
+            scheduledDate: scheduledDate ?? null,
+          }),
         },
       ],
     })

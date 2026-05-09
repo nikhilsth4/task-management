@@ -64,7 +64,7 @@ export default function TaskDetail() {
   const [errors, setErrors] = useState<FieldErrors>({})
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [breakdownSuggestions, setBreakdownSuggestions] = useState<string[]>([])
+  const [breakdownSuggestions, setBreakdownSuggestions] = useState<{ title: string; urgency: Urgency; importance: Importance; duration: number }[]>([])
   const [breakdownSelected, setBreakdownSelected] = useState<boolean[]>([])
   const [breakdownLoading, setBreakdownLoading] = useState(false)
   const [breakdownError, setBreakdownError] = useState<string | null>(null)
@@ -148,6 +148,7 @@ export default function TaskDetail() {
     })
 
     setSaved(true)
+    setSelectedTaskId(null);
     setTimeout(() => setSaved(false), 1500)
   }
 
@@ -186,7 +187,7 @@ export default function TaskDetail() {
       const res = await fetch('/api/ai/breakdown', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, notes, projectTitle: proj?.title }),
+        body: JSON.stringify({ title, notes, projectTitle: proj?.title, duration: t.duration, scheduledDate: t.scheduledDate }),
       })
       const data = await res.json()
       if (!res.ok || data.error) {
@@ -202,9 +203,40 @@ export default function TaskDetail() {
     }
   }
 
+  function advanceTime(time: string | null, minutes: number): string | null {
+    if (!time) return null
+    const [h, m] = time.split(':').map(Number)
+    const total = h * 60 + m + minutes
+    return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+  }
+
+  // Compute sequential scheduled times for each suggestion based on current selection
+  function computeSubtaskTimes(): (string | null)[] {
+    let current = t.scheduledTime ?? null
+    return breakdownSuggestions.map((s, i) => {
+      if (!breakdownSelected[i]) return null
+      const time = current
+      current = advanceTime(current, s.duration)
+      return time
+    })
+  }
+
   function applyBreakdown() {
+    const subtaskTimes = computeSubtaskTimes()
+    const selected = breakdownSuggestions.filter((_, i) => breakdownSelected[i])
+
     breakdownSuggestions.forEach((s, i) => {
-      if (breakdownSelected[i]) addTask({ title: s, projectId: t.projectId, urgency: t.urgency, importance: t.importance })
+      if (!breakdownSelected[i]) return
+      addTask({
+        title: s.title,
+        projectId: t.projectId,
+        urgency: s.urgency,
+        importance: s.importance,
+        duration: s.duration,
+        scheduledDate: t.scheduledDate,
+        scheduledTime: subtaskTimes[i],
+        tags: t.tags,
+      })
     })
     setBreakdownSuggestions([])
     setBreakdownSelected([])
@@ -397,17 +429,32 @@ export default function TaskDetail() {
                     >Dismiss</button>
                   </div>
                   <div className="flex flex-col">
-                    {breakdownSuggestions.map((s, i) => (
-                      <label key={i} className="flex items-center gap-2.5 px-3 py-2 cursor-pointer text-[13px]" style={{ borderBottom: i < breakdownSuggestions.length - 1 ? '1px solid var(--color-hairline)' : undefined, color: 'var(--color-ink)' }}>
-                        <input
-                          type="checkbox"
-                          checked={breakdownSelected[i] ?? false}
-                          onChange={(e) => setBreakdownSelected((prev) => prev.map((v, j) => j === i ? e.target.checked : v))}
-                          className="w-3.5 h-3.5 cursor-pointer accent-green-600"
-                        />
-                        {s}
-                      </label>
-                    ))}
+                    {(() => {
+                      const times = computeSubtaskTimes()
+                      return breakdownSuggestions.map((s, i) => (
+                        <label key={i} className="flex items-center gap-2.5 px-3 py-2 cursor-pointer" style={{ borderBottom: i < breakdownSuggestions.length - 1 ? '1px solid var(--color-hairline)' : undefined }}>
+                          <input
+                            type="checkbox"
+                            checked={breakdownSelected[i] ?? false}
+                            onChange={(e) => setBreakdownSelected((prev) => prev.map((v, j) => j === i ? e.target.checked : v))}
+                            className="w-3.5 h-3.5 cursor-pointer accent-green-600 shrink-0"
+                          />
+                          <span className="flex-1 text-[13px]" style={{ color: 'var(--color-ink)' }}>{s.title}</span>
+                          <span className="flex items-center gap-1.5 shrink-0">
+                            {s.urgency === 'high' && (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ background: 'var(--badge-q1-bg)', color: 'var(--badge-q1-text)' }}>urgent</span>
+                            )}
+                            {s.importance === 'high' && (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ background: 'var(--badge-q2-bg)', color: 'var(--color-blue-action)' }}>important</span>
+                            )}
+                            {times[i] && (
+                              <span className="text-[11px]" style={{ color: 'var(--color-blue-action)' }}>{times[i]}</span>
+                            )}
+                            <span className="text-[11px]" style={{ color: 'var(--color-muted)' }}>{s.duration}m</span>
+                          </span>
+                        </label>
+                      ))
+                    })()}
                   </div>
                   <div className="px-3 py-2" style={{ borderTop: '1px solid var(--color-hairline)', background: 'var(--color-surface)' }}>
                     <button
