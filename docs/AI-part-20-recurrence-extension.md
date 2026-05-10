@@ -1,6 +1,6 @@
 ---
 
-## Part 21: Recurrence Detection in Project Chat
+## Part 20 Extension: Recurrence Detection in Project Chat
 
 ### Phase 0 Required: No (extends Part 20)
 
