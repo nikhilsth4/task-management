@@ -695,8 +695,111 @@ Use docs/part-19-AI.md for Part 19
 Use docs/ai-part-20-project.md for part 20
 
 
+## Part 21: Smart QuickCapture (Natural Language Shorthand)
+
+### Phase 0 Required: No
+
+### Context
+QuickCapture currently creates every task as `urgency: low`, `importance: low`, no project, no date. Users have to open the TaskDetail drawer to set any of these fields — breaking flow state. This part adds lightweight string parsing so power users can set fields inline while typing, with no API calls and no latency.
+
+Smart Capture AI (✨ button) remains for full natural language sentences. This is the fast shorthand layer underneath it.
+
 ---
-## Part 21: Data Fetching Optimisation
+
+### Syntax Reference
+
+| Token | Example | Result |
+|---|---|---|
+| `#ProjectName` | `#Work` | Assigns to matching project (fuzzy match) |
+| `!today` | `!today` | `scheduledDate` = today |
+| `!tomorrow` | `!tomorrow` | `scheduledDate` = tomorrow |
+| `!monday` … `!sunday` | `!friday` | `scheduledDate` = next occurrence of that weekday |
+| `!YYYY-MM-DD` | `!2026-05-15` | `scheduledDate` = exact date |
+| `@2pm` `@14:00` `@9am` | `@3pm` | `scheduledTime` = parsed time |
+| `!!` | `!!` | `urgency: high` |
+| `!!!` | `!!!` | `urgency: high`, `importance: high` (Q1) |
+
+Tokens are stripped from the final task title before saving.
+
+**Example inputs:**
+```
+"Call Mom !today @3pm"           → title: "Call Mom", scheduledDate: today, scheduledTime: 15:00
+"Email report #Work !friday"     → title: "Email report", project: Work, scheduledDate: next Friday
+"Fix critical bug !!! #Work"     → title: "Fix critical bug", urgency: high, importance: high, project: Work
+"Buy milk !tomorrow @9am"        → title: "Buy milk", scheduledDate: tomorrow, scheduledTime: 09:00
+```
+
+---
+
+### Substeps
+
+#### Parser
+- [x] 21.1 Create `lib/quickparse.ts` — pure function, no side effects
+  ```ts
+  interface ParsedCapture {
+    title: string
+    projectId: string | null
+    scheduledDate: string | null   // ISO date
+    scheduledTime: string | null   // HH:MM
+    urgency: 'high' | 'low'
+    importance: 'high' | 'low'
+    chips: { project?, date?, time?, urgent?, important? }  // for UI preview
+  }
+
+  export function parseQuickCapture(input: string, projects: Project[]): ParsedCapture
+  ```
+- [x] 21.2 Parse `#Tag` tokens — fuzzy match: exact → prefix → substring (all case-insensitive)
+  - `#wo` matches "Work"
+  - No match → `projectId: null`, token still stripped from title
+- [x] 21.3 Parse `!date` tokens:
+  - `!today` → today's ISO date
+  - `!tomorrow` → tomorrow's ISO date
+  - `!monday` … `!sunday` → next future occurrence of that weekday
+  - `!YYYY-MM-DD` → exact date passthrough
+- [x] 21.4 Parse `@time` tokens:
+  - `@2pm` → `14:00`
+  - `@14:00` → `14:00`
+  - `@9am` → `09:00`
+  - `@9:30am` → `09:30`
+- [x] 21.5 Parse urgency/importance tokens:
+  - `!!` → `urgency: high`
+  - `!!!` → `urgency: high`, `importance: high` (matched first to avoid `!!` shadowing)
+- [x] 21.6 Strip all matched tokens from the title, trim whitespace
+- [ ] 21.7 ~~Write unit tests for `lib/quickparse.ts`~~ — skipped: no test runner configured in repo. Verified manually + via type check.
+
+#### QuickCapture UI
+- [x] 21.8 Wire `parseQuickCapture` into `QuickCapture.tsx` — parsed via `useMemo` on every value change (no debounce needed — pure function, instant)
+- [x] 21.9 Show inline chip preview below the input — only when tokens are detected
+- [x] 21.10 On submit — use parsed fields (`projectId`, `scheduledDate`, `scheduledTime`, `urgency`, `importance`) when creating the task
+- [x] 21.11 If no tokens detected — behave exactly as before (title only, all defaults)
+- [x] 21.12 Chip styling: project color dot for `#`, stone surface for date/time, coral `--badge-q1-bg` for Urgent, blue `--badge-q2-bg` for Important
+
+#### Smart Capture AI Coexistence
+- [x] 21.13 ✨ button threshold unchanged — still appears at > 15 chars
+- [x] 21.14 Submit button uses `parsed.title` (token-stripped) for the disabled check, so a string of pure tokens doesn't allow blank submission
+- [x] 21.15 Chip preview row appears between input and any error banner — they stack naturally
+
+### Files Created / Modified
+```
+lib/quickparse.ts                     (new)
+components/task/QuickCapture.tsx      (parse on keystroke + chip preview + use parsed fields on submit)
+```
+
+### Tests & Success Criteria (Tier 1 + 2)
+- [x] `"Call Mom !today @3pm"` → title: "Call Mom", scheduledDate: today, scheduledTime: "15:00"
+- [x] `"Fix bug #Work !!!"` → project: Work, urgency: high, importance: high
+- [x] `"Buy milk !friday"` → scheduledDate: next Friday ISO date
+- [x] `"Review PR !2026-06-01"` → scheduledDate: "2026-06-01"
+- [x] `"#wo"` fuzzy matches "Work" project
+- [x] `"#xyz"` no match → projectId null, token stripped from title
+- [x] No tokens → task created with all defaults, no chip preview shown
+- [x] Chip preview appears and updates on each keystroke (instant via useMemo)
+- [x] Chips disappear when tokens are removed from input
+- [x] Submitted task title has all tokens stripped and whitespace trimmed
+- [x] `tsc --noEmit` passes with zero errors
+
+---
+## Part 22: Data Fetching Optimisation
 
 ### Problem
 The global `fetchTasks()` loads every task for the user on boot — no limit, no filter. Over time (months of history), this becomes slow and wasteful. Completed tasks from weeks ago are fetched on every session even though no active view needs them.
